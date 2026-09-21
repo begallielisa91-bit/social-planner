@@ -4,23 +4,62 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Social Planner</title>
-</head>
 
-<body>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-  <h1>Social Planner</h1>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #25283d;
+    }
 
-  <p>Il tuo spazio per organizzare i social.</p>
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 240px;
+      height: 100vh;
+      background: white;
+      padding: 25px 15px;
+      box-shadow: 3px 0 15px rgba(0,0,0,0.06);
+    }
 
-  <h2>Dashboard</h2>
+    .logo {
+      font-size: 23px;
+      font-weight: bold;
+      margin-bottom: 35px;
+      padding: 0 12px;
+    }
 
-  <ul>
-    <li>📅 Calendario</li>
-    <li>✍️ Creazione post con IA</li>
-    <li>🖼️ Archivio immagini e video</li>
-    <li>📊 Statistiche</li>
-    <li>👥 Clienti e pagine</li>
-  </ul>
+    .menu a {
+      display: block;
+      padding: 14px 15px;
+      margin-bottom: 7px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #444;
+      font-size: 16px;
+    }
 
-</body>
-</html>
+    .menu a:hover,
+    .menu a.active {
+      background: #eeeaff;
+      color: #6c63ff;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 35px;
+    }
+
+    .top {
+      margin-bottom: 30px;
+    }
+
+    .top h1 {
+      margin: 0 0 8px;
+      font-size: 30
