@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Social Planner Pro</title>
 
   <style>
@@ -12,12 +12,13 @@
 
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: #f5f7fb;
       color: #25283d;
+      padding-bottom: 70px; /* Spazio per la nav bar mobile */
     }
 
-    /* Auth Modal Screen */
+    /* Schermata Login */
     #auth-screen {
       position: fixed;
       top: 0;
@@ -29,15 +30,16 @@
       align-items: center;
       justify-content: center;
       z-index: 1000;
+      padding: 20px;
     }
 
     .auth-box {
       background: white;
-      padding: 40px;
+      padding: 30px 20px;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
       width: 100%;
-      max-width: 400px;
+      max-width: 380px;
       text-align: center;
     }
 
@@ -54,10 +56,10 @@
       border: 1px solid #e0e0e0;
       border-radius: 8px;
       outline: none;
-      font-size: 14px;
+      font-size: 15px;
     }
 
-    /* Sidebar Navigation */
+    /* Sidebar Navigation (Desktop) */
     .sidebar {
       position: fixed;
       left: 0;
@@ -75,14 +77,11 @@
     }
 
     .logo {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: bold;
-      margin-bottom: 30px;
-      padding: 0 12px;
+      margin-bottom: 25px;
+      padding: 0 10px;
       color: #6c63ff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .menu a {
@@ -96,7 +95,6 @@
       color: #555566;
       font-size: 15px;
       font-weight: 500;
-      transition: all 0.2s ease;
       cursor: pointer;
     }
 
@@ -110,15 +108,12 @@
     .user-footer {
       border-top: 1px solid #eee;
       padding-top: 15px;
-      margin-top: 20px;
     }
 
     .user-info {
       font-size: 14px;
       font-weight: bold;
-      color: #333;
       margin-bottom: 10px;
-      padding: 0 10px;
     }
 
     .btn-logout {
@@ -132,27 +127,56 @@
       font-weight: 600;
     }
 
-    /* Main Area */
-    .main {
-      margin-left: 250px;
-      padding: 35px;
+    /* Navigation Bar Infeirore (Mobile) */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      border-top: 1px solid #eee;
+      padding: 8px 0;
+      z-index: 200;
+      justify-content: space-around;
     }
 
-    .top {
-      margin-bottom: 30px;
+    .mobile-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 11px;
+      color: #777;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .mobile-nav a.active {
+      color: #6c63ff;
+      font-weight: bold;
+    }
+
+    .mobile-nav span {
+      font-size: 18px;
+    }
+
+    /* Contenuto Principale */
+    .main {
+      margin-left: 250px;
+      padding: 30px;
     }
 
     .top h1 {
       margin: 0 0 8px;
-      font-size: 28px;
+      font-size: 24px;
     }
 
     .top p {
-      margin: 0;
+      margin: 0 0 20px;
       color: #777788;
+      font-size: 14px;
     }
 
-    /* Gestione Sezioni */
     .section {
       display: none;
     }
@@ -161,75 +185,69 @@
       display: block;
     }
 
-    /* Dashboard Cards Grid */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-top: 25px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
     }
 
     .card {
       background: white;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
 
     .card h3 {
-      margin: 0 0 10px;
-      font-size: 13px;
+      margin: 0 0 8px;
+      font-size: 12px;
       color: #888899;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .card .value {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: bold;
-      color: #25283d;
     }
 
-    /* Form Crea Post & Anteprima */
+    /* Layout Editor */
     .editor-container {
       display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 30px;
+      grid-template-columns: 1fr 350px;
+      gap: 20px;
     }
 
-    .form-box {
+    .form-box, .preview-box {
       background: white;
-      padding: 25px;
+      padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .form-group select,
     .form-group textarea,
     .form-group input {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       border: 1px solid #e0e0e0;
       border-radius: 8px;
       font-family: inherit;
       font-size: 14px;
-      outline: none;
     }
 
     .form-group textarea {
-      height: 120px;
-      resize: vertical;
+      height: 100px;
     }
 
     .btn-tools {
@@ -240,16 +258,14 @@
 
     .btn-ai, .btn-canva {
       border: none;
-      padding: 9px 14px;
+      padding: 10px;
       border-radius: 6px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
       text-decoration: none;
+      text-align: center;
+      flex: 1;
     }
 
     .btn-ai {
@@ -258,56 +274,33 @@
       border: 1px solid #6c63ff;
     }
 
-    .btn-ai:hover {
-      background: #6c63ff;
-      color: white;
-    }
-
     .btn-canva {
       background: #00c4cc;
       color: white;
-    }
-
-    .btn-canva:hover {
-      background: #00a0a6;
     }
 
     .btn-primary {
       background: #6c63ff;
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 12px;
       border-radius: 8px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       width: 100%;
-      transition: background 0.2s;
-    }
-
-    .btn-primary:hover {
-      background: #574ffd;
-    }
-
-    /* Anteprima Post */
-    .preview-box {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     }
 
     .preview-header {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     .preview-avatar {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: #6c63ff;
       color: white;
@@ -318,160 +311,109 @@
     }
 
     .preview-text {
-      font-size: 14px;
-      line-height: 1.5;
+      font-size: 13px;
+      line-height: 1.4;
       white-space: pre-wrap;
-      color: #333;
-      min-height: 60px;
+      min-height: 50px;
     }
 
     .preview-media {
       width: 100%;
       border-radius: 8px;
-      margin-top: 12px;
+      margin-top: 10px;
       display: none;
-      max-height: 250px;
+      max-height: 220px;
       object-fit: cover;
     }
 
-    /* Calendario Griglia Mensile */
+    /* Griglia Calendario */
     .month-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
+      gap: 6px;
       background: white;
-      padding: 20px;
+      padding: 15px;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     }
 
     .day-name {
       font-weight: bold;
       text-align: center;
-      padding: 8px 0;
+      font-size: 11px;
       color: #6c63ff;
+      padding-bottom: 5px;
     }
 
     .day-square {
       background: #fdfdfd;
       border: 1px solid #eee;
-      border-radius: 8px;
-      min-height: 90px;
-      padding: 8px;
-      font-size: 12px;
-    }
-
-    .day-square .day-num {
-      font-weight: bold;
-      color: #888;
-      margin-bottom: 5px;
+      border-radius: 6px;
+      min-height: 60px;
+      padding: 4px;
+      font-size: 11px;
     }
 
     .post-tag {
       background: #eeeaff;
       color: #6c63ff;
-      padding: 3px 6px;
-      border-radius: 4px;
-      font-size: 10px;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-size: 9px;
       font-weight: 600;
-      margin-top: 4px;
+      margin-top: 2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    /* Statistiche & Grafici */
-    .chart-container {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    }
+    /* REGOLAZIONI PER SCHERMI PICCOLI (MOBILE) */
+    @media (max-width: 768px) {
+      body {
+        padding-bottom: 75px;
+      }
 
-    .bar-chart {
-      display: flex;
-      align-items: flex-end;
-      gap: 15px;
-      height: 150px;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-bottom: 2px solid #eee;
-    }
+      .sidebar {
+        display: none; /* Nasconde la sidebar su smartphone */
+      }
 
-    .bar {
-      flex: 1;
-      background: #6c63ff;
-      border-radius: 6px 6px 0 0;
-      position: relative;
-    }
+      .mobile-nav {
+        display: flex; /* Mostra la barra inferiore */
+      }
 
-    .bar::after {
-      content: attr(data-label);
-      position: absolute;
-      bottom: -25px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 11px;
-      color: #777;
-    }
+      .main {
+        margin-left: 0;
+        padding: 20px 15px;
+      }
 
-    /* Pricing Section (Landing) */
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
+      .editor-container {
+        grid-template-columns: 1fr; /* Mette editor e anteprima in verticale */
+      }
 
-    .plan-card {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      border: 1px solid #e0e0e0;
-      text-align: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    }
+      .day-square {
+        min-height: 45px;
+        padding: 2px;
+      }
 
-    .plan-card.featured {
-      border: 2px solid #6c63ff;
-      position: relative;
-    }
-
-    .plan-card h2 {
-      margin-top: 0;
-    }
-
-    .price {
-      font-size: 32px;
-      font-weight: bold;
-      color: #6c63ff;
-      margin: 15px 0;
-    }
-
-    .api-card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      .post-tag {
+        font-size: 8px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Schermata di Autenticazione (Login) -->
+  <!-- Login -->
   <div id="auth-screen">
     <div class="auth-box">
       <h2>🚀 Social Planner Pro</h2>
-      <p style="color:#666; font-size:14px; margin-bottom:20px;">Accedi al tuo pannello di controllo</p>
-      <input type="text" id="login-username" placeholder="Nome utente o Email">
+      <p style="color:#666; font-size:13px; margin-bottom:15px;">Accedi al pannello di controllo</p>
+      <input type="text" id="login-username" placeholder="Nome utente">
       <input type="password" id="login-password" placeholder="Password">
       <button class="btn-primary" onclick="login()">Accedi</button>
     </div>
   </div>
 
-  <!-- Sidebar -->
+  <!-- Sidebar Desktop -->
   <div class="sidebar">
     <div>
       <div class="logo">🚀 Social Planner</div>
@@ -479,54 +421,55 @@
         <a onclick="showSection('dashboard')" id="nav-dashboard" class="active">🏠 Dashboard</a>
         <a onclick="showSection('calendario')" id="nav-calendario">📅 Calendario</a>
         <a onclick="showSection('crea-post')" id="nav-crea-post">✍️ Crea post</a>
-        <a onclick="showSection('media')" id="nav-media">🖼️ Media / Canva</a>
         <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
-        <a onclick="showSection('piani')" id="nav-piani">💎 Piani & Prezzi</a>
-        <a onclick="showSection('impostazioni')" id="nav-impostazioni">⚙️ Impostazioni API</a>
+        <a onclick="showSection('impostazioni')" id="nav-impostazioni">⚙️ API Social</a>
       </div>
     </div>
-
     <div class="user-footer">
       <div class="user-info">👤 <span id="user-display-name">Utente</span></div>
       <button class="btn-logout" onclick="logout()">Esci</button>
     </div>
   </div>
 
-  <!-- Contenuto Principale -->
+  <!-- Navigation Bar Mobile (in basso) -->
+  <div class="mobile-nav">
+    <a onclick="showSection('dashboard')" id="mnav-dashboard" class="active"><span>🏠</span>Home</a>
+    <a onclick="showSection('calendario')" id="mnav-calendario"><span>📅</span>Agenda</a>
+    <a onclick="showSection('crea-post')" id="mnav-crea-post"><span>✍️</span>Crea</a>
+    <a onclick="showSection('statistiche')" id="mnav-statistiche"><span>📊</span>Stats</a>
+    <a onclick="showSection('impostazioni')" id="mnav-impostazioni"><span>⚙️</span>API</a>
+  </div>
+
+  <!-- Contenuto -->
   <div class="main">
 
-    <!-- SEZIONE: Dashboard -->
+    <!-- Dashboard -->
     <div id="sec-dashboard" class="section active">
       <div class="top">
-        <h1>Benvenuta nel Social Planner</h1>
-        <p>Panoramica dei tuoi contenuti registrati e sincronizzati.</p>
+        <h1>Dashboard</h1>
+        <p>Panoramica dei tuoi contenuti.</p>
       </div>
       <div class="grid">
         <div class="card">
-          <h3>Post In Programmazione</h3>
+          <h3>In Programmazione</h3>
           <div class="value" id="count-scheduled">0</div>
         </div>
         <div class="card">
-          <h3>Post Salvati Totali</h3>
+          <h3>Post Totali</h3>
           <div class="value" id="count-total">0</div>
-        </div>
-        <div class="card">
-          <h3>Canali Collegati</h3>
-          <div class="value" id="count-connected">3</div>
         </div>
       </div>
     </div>
 
-    <!-- SEZIONE: Crea Post -->
+    <!-- Crea Post -->
     <div id="sec-crea-post" class="section">
       <div class="top">
-        <h1>Crea un nuovo post</h1>
-        <p>Genera testo con AI, usa Canva o carica immagini/video per la programmazione.</p>
+        <h1>Crea Post</h1>
       </div>
       <div class="editor-container">
         <div class="form-box">
           <div class="form-group">
-            <label>Seleziona Canale Social</label>
+            <label>Canale Social</label>
             <select id="channel-select" onchange="updatePreview()">
               <option value="Instagram">Instagram</option>
               <option value="Facebook">Facebook</option>
@@ -535,40 +478,39 @@
           </div>
 
           <div class="btn-tools">
-            <button class="btn-ai" onclick="generateAiText()">✨ Genera con AI</button>
-            <a class="btn-canva" href="https://www.canva.com" target="_blank">🎨 Apri Canva</a>
+            <button class="btn-ai" onclick="generateAiText()">✨ Testo AI</button>
+            <a class="btn-canva" href="https://www.canva.com" target="_blank">🎨 Canva</a>
           </div>
 
           <div class="form-group">
-            <label>Testo del Post</label>
-            <textarea id="post-text" placeholder="Scrivi il post o usa l'AI..." oninput="updatePreview()"></textarea>
+            <label>Testo</label>
+            <textarea id="post-text" placeholder="Scrivi il testo del post..." oninput="updatePreview()"></textarea>
           </div>
 
           <div class="form-group">
-            <label>Carica Immagine o Video (Reel)</label>
+            <label>Foto o Video</label>
             <input type="file" id="post-file" accept="image/*,video/*" onchange="previewMedia(event)">
           </div>
 
           <div class="form-group">
-            <label>Data e Ora di Pubblicazione</label>
+            <label>Data e Ora</label>
             <input type="datetime-local" id="post-date">
           </div>
 
-          <button class="btn-primary" onclick="schedulePost()">Programma e Salva Post</button>
+          <button class="btn-primary" onclick="schedulePost()">Salva e Programma</button>
         </div>
 
-        <!-- Anteprima -->
         <div>
-          <h3 style="margin-top:0;">Anteprima Live</h3>
+          <h3 style="margin-top:0; font-size:16px;">Anteprima</h3>
           <div class="preview-box">
             <div class="preview-header">
               <div class="preview-avatar">SP</div>
               <div>
-                <strong>Il tuo Brand</strong><br>
+                <strong>Brand</strong><br>
                 <small id="preview-platform" style="color:#777;">Instagram</small>
               </div>
             </div>
-            <div class="preview-text" id="preview-content">Il testo del tuo post apparirà qui...</div>
+            <div class="preview-text" id="preview-content">Anteprima testo...</div>
             <img id="img-preview" class="preview-media" alt="Anteprima Immagine">
             <video id="video-preview" class="preview-media" controls></video>
           </div>
@@ -576,149 +518,49 @@
       </div>
     </div>
 
-    <!-- SEZIONE: Calendario Mensile -->
+    <!-- Calendario -->
     <div id="sec-calendario" class="section">
       <div class="top">
-        <h1>Calendario Editoriale Mensile</h1>
-        <p>Visualizzazione visiva dei post pianificati per il mese in corso.</p>
+        <h1>Calendario</h1>
       </div>
-
       <div class="month-grid">
-        <div class="day-name">Lun</div>
-        <div class="day-name">Mar</div>
-        <div class="day-name">Mer</div>
-        <div class="day-name">Gio</div>
-        <div class="day-name">Ven</div>
-        <div class="day-name">Sab</div>
-        <div class="day-name">Dom</div>
+        <div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div>
+        <div class="day-name">G</div><div class="day-name">V</div><div class="day-name">S</div><div class="day-name">D</div>
 
-        <div class="day-square"><div class="day-num">1</div></div>
-        <div class="day-square"><div class="day-num">2</div></div>
-        <div class="day-square"><div class="day-num">3</div></div>
-        <div class="day-square"><div class="day-num">4</div></div>
-        <div class="day-square"><div class="day-num">5</div></div>
-        <div class="day-square"><div class="day-num">6</div></div>
-        <div class="day-square"><div class="day-num">7</div></div>
-        <div class="day-square"><div class="day-num">8</div></div>
-        <div class="day-square"><div class="day-num">9</div></div>
-        <div class="day-square"><div class="day-num">10</div></div>
-        <div class="day-square"><div class="day-num">11</div></div>
-        <div class="day-square"><div class="day-num">12</div></div>
-        <div class="day-square"><div class="day-num">13</div></div>
-        <div class="day-square"><div class="day-num">14</div></div>
-        <div class="day-square"><div class="day-num">15</div></div>
-        <div class="day-square" id="day-cell-posts"><div class="day-num">16</div><div id="cal-post-tags"></div></div>
-        <div class="day-square"><div class="day-num">17</div></div>
-        <div class="day-square"><div class="day-num">18</div></div>
-        <div class="day-square"><div class="day-num">19</div></div>
-        <div class="day-square"><div class="day-num">20</div></div>
-        <div class="day-square"><div class="day-num">21</div></div>
-        <div class="day-square"><div class="day-num">22</div></div>
-        <div class="day-square"><div class="day-num">23</div></div>
-        <div class="day-square"><div class="day-num">24</div></div>
-        <div class="day-square"><div class="day-num">25</div></div>
-        <div class="day-square"><div class="day-num">26</div></div>
-        <div class="day-square"><div class="day-num">27</div></div>
-        <div class="day-square"><div class="day-num">28</div></div>
-        <div class="day-square"><div class="day-num">29</div></div>
-        <div class="day-square"><div class="day-num">30</div></div>
-        <div class="day-square"><div class="day-num">31</div></div>
+        <div class="day-square">1</div><div class="day-square">2</div><div class="day-square">3</div>
+        <div class="day-square">4</div><div class="day-square">5</div><div class="day-square">6</div>
+        <div class="day-square">7</div><div class="day-square">8</div><div class="day-square">9</div>
+        <div class="day-square">10</div><div class="day-square">11</div><div class="day-square">12</div>
+        <div class="day-square">13</div><div class="day-square">14</div><div class="day-square">15</div>
+        <div class="day-square" id="day-cell-posts">16<div id="cal-post-tags"></div></div>
+        <div class="day-square">17</div><div class="day-square">18</div><div class="day-square">19</div>
+        <div class="day-square">20</div><div class="day-square">21</div><div class="day-square">22</div>
+        <div class="day-square">23</div><div class="day-square">24</div><div class="day-square">25</div>
+        <div class="day-square">26</div><div class="day-square">27</div><div class="day-square">28</div>
+        <div class="day-square">29</div><div class="day-square">30</div><div class="day-square">31</div>
       </div>
     </div>
 
-    <!-- SEZIONE: Media -->
-    <div id="sec-media" class="section">
-      <div class="top">
-        <h1>Libreria Media & Canva</h1>
-        <p>Crea la grafica del tuo brand su Canva ed e-importala nei post.</p>
-        <a class="btn-canva" href="https://www.canva.com" target="_blank" style="padding:12px 20px;">🎨 Apri Studio Canva</a>
-      </div>
-    </div>
-
-    <!-- SEZIONE: Statistiche -->
+    <!-- Statistiche -->
     <div id="sec-statistiche" class="section">
       <div class="top">
-        <h1>Statistiche & Analytics</h1>
-        <p>Analisi delle performance e della copertura dei tuoi contenuti.</p>
+        <h1>Statistiche</h1>
       </div>
-
       <div class="grid">
-        <div class="card"><h3>Copertura Totale</h3><div class="value">12.450</div></div>
-        <div class="card"><h3>Interazioni</h3><div class="value">1.820</div></div>
-        <div class="card"><h3>Nuovi Follower</h3><div class="value">+340</div></div>
-      </div>
-
-      <div class="chart-container">
-        <h3>Andamento delle Interazioni Settimanali</h3>
-        <div class="bar-chart">
-          <div class="bar" style="height: 40%;" data-label="Lun"></div>
-          <div class="bar" style="height: 65%;" data-label="Mar"></div>
-          <div class="bar" style="height: 30%;" data-label="Mer"></div>
-          <div class="bar" style="height: 85%;" data-label="Gio"></div>
-          <div class="bar" style="height: 95%;" data-label="Ven"></div>
-          <div class="bar" style="height: 50%;" data-label="Sab"></div>
-          <div class="bar" style="height: 70%;" data-label="Dom"></div>
-        </div>
+        <div class="card"><h3>Copertura</h3><div class="value">12.4K</div></div>
+        <div class="card"><h3>Interazioni</h3><div class="value">1.8K</div></div>
       </div>
     </div>
 
-    <!-- SEZIONE: Piani e Prezzi (SaaS Landing) -->
-    <div id="sec-piani" class="section">
-      <div class="top">
-        <h1>Scegli il tuo Piano Social Planner</h1>
-        <p>Soluzioni flessibili per creator, professionisti e agenzie.</p>
-      </div>
-
-      <div class="pricing-grid">
-        <div class="plan-card">
-          <h2>Starter</h2>
-          <div class="price">9€ <small>/mese</small></div>
-          <p>Fino a 3 Account Social</p>
-          <p>30 Post Programmati/mese</p>
-          <p>Assistente AI base</p>
-          <button class="btn-primary" style="margin-top:20px;">Scegli Starter</button>
-        </div>
-
-        <div class="plan-card featured">
-          <h2>Pro</h2>
-          <div class="price">29€ <small>/mese</small></div>
-          <p>Fino a 10 Account Social</p>
-          <p>Post e Reels Illimitati</p>
-          <p>AI Generator Illimitato</p>
-          <p>Analytics Avanzate</p>
-          <button class="btn-primary" style="margin-top:20px;">Prova Pro Gratis</button>
-        </div>
-
-        <div class="plan-card">
-          <h2>Agency</h2>
-          <div class="price">79€ <small>/mese</small></div>
-          <p>Account e Clienti Illimitati</p>
-          <p>Gestione Multi-Team</p>
-          <p>Supporto Prioritario</p>
-          <button class="btn-primary" style="margin-top:20px;">Contatta Vendite</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- SEZIONE: Impostazioni API Social -->
+    <!-- Impostazioni -->
     <div id="sec-impostazioni" class="section">
       <div class="top">
-        <h1>Integrazione API Social Network</h1>
-        <p>Incolla qui i tuoi Access Token di sviluppo per collegare i profili ufficiali Meta e LinkedIn.</p>
+        <h1>Impostazioni API</h1>
       </div>
-
-      <div class="api-card">
-        <h3>📸 Meta / Instagram Graph API</h3>
-        <p style="font-size:13px; color:#666;">Richiede Access Token rilasciato da Meta for Developers.</p>
-        <input type="password" id="meta-token" placeholder="Incolla Meta Access Token..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:10px;">
-        <button class="btn-primary" style="width:auto;" onclick="saveApiKeys()">Salva Token Meta</button>
-      </div>
-
-      <div class="api-card">
-        <h3>💼 LinkedIn API</h3>
-        <p style="font-size:13px; color:#666;">Richiede Access Token dell'applicazione LinkedIn Developer.</p>
-        <input type="password" id="linkedin-token" placeholder="Incolla LinkedIn Access Token..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:10px;">
-        <button class="btn-primary" style="width:auto;" onclick="saveApiKeys()">Salva Token LinkedIn</button>
+      <div class="card" style="margin-bottom:15px;">
+        <h3 style="color:#25283d; font-size:14px; margin-bottom:8px;">Token Meta / Instagram</h3>
+        <input type="password" id="meta-token" placeholder="Incolla Token Meta..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:10px;">
+        <button class="btn-primary" onclick="saveApiKeys()">Salva</button>
       </div>
     </div>
 
@@ -763,16 +605,22 @@
     function showSection(sectionId) {
       document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
       document.querySelectorAll('.menu a').forEach(nav => nav.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav a').forEach(nav => nav.classList.remove('active'));
 
       document.getElementById('sec-' + sectionId).classList.add('active');
-      document.getElementById('nav-' + sectionId).classList.add('active');
+      
+      const desktopNav = document.getElementById('nav-' + sectionId);
+      const mobileNav = document.getElementById('mnav-' + sectionId);
+      
+      if (desktopNav) desktopNav.classList.add('active');
+      if (mobileNav) mobileNav.classList.add('active');
     }
 
     function updatePreview() {
       const text = document.getElementById('post-text').value;
       const platform = document.getElementById('channel-select').value;
 
-      document.getElementById('preview-content').innerText = text || 'Il testo del tuo post apparirà qui...';
+      document.getElementById('preview-content').innerText = text || 'Anteprima testo...';
       document.getElementById('preview-platform').innerText = platform;
     }
 
@@ -804,9 +652,9 @@
 
     function generateAiText() {
       const suggestions = [
-        "✨ Novità in arrivo! Stiamo lavorando a qualcosa di speciale per voi. Restate sintonizzati! 🚀 #socialplanner #news #creativita",
-        "💡 Consiglio del giorno: La costanza nella pubblicazione è la chiave per far crescere la tua community. Tu ogni quanto pubblichi? 👇 #socialmediamarketing #tips",
-        "🎉 Buon inizio settimana a tutti! Quali sono i tuoi obiettivi per questi prossimi giorni? Scrivimelo nei commenti! ☕ #motivation #mondayvibes"
+        "✨ Novità in arrivo! Restate sintonizzati! 🚀 #news #creativita",
+        "💡 Consiglio del giorno: La costanza è la chiave! 👇 #marketing",
+        "🎉 Buon inizio settimana! Quali sono i tuoi obiettivi? ☕ #motivation"
       ];
       const randomText = suggestions[Math.floor(Math.random() * suggestions.length)];
       document.getElementById('post-text').value = randomText;
@@ -838,7 +686,6 @@
       renderCalendarTags();
       updateDashboardCounts();
 
-      // Reset Form
       document.getElementById('post-text').value = '';
       document.getElementById('post-date').value = '';
       document.getElementById('post-file').value = '';
@@ -848,7 +695,7 @@
       currentMediaType = '';
       updatePreview();
 
-      alert('Post programmato e salvato con successo!');
+      alert('Post programmato!');
       showSection('calendario');
     }
 
@@ -860,7 +707,7 @@
       scheduledPosts.forEach(post => {
         const tag = document.createElement('div');
         tag.className = 'post-tag';
-        tag.innerText = `${post.platform}: ${post.text.substring(0, 12)}...`;
+        tag.innerText = `${post.platform}: ${post.text.substring(0, 8)}...`;
         container.appendChild(tag);
       });
     }
@@ -872,10 +719,8 @@
 
     function saveApiKeys() {
       const meta = document.getElementById('meta-token').value;
-      const linkedin = document.getElementById('linkedin-token').value;
       if (meta) localStorage.setItem('sp_meta_token', meta);
-      if (linkedin) localStorage.setItem('sp_linkedin_token', linkedin);
-      alert('Token salvati con successo nel tuo browser!');
+      alert('Token salvato!');
     }
   </script>
 
