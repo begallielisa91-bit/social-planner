@@ -3,406 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Social Planner Pro</title>
+  <title>Social & Email Planner Pro</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: #f5f7fb;
       color: #25283d;
-      padding-bottom: 70px;
+      padding-bottom: 75px;
     }
 
-    /* Schermata Login */
     #auth-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #f5f7fb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 20px;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #f5f7fb; display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 20px;
     }
-
     .auth-box {
-      background: white;
-      padding: 30px 20px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      width: 100%;
-      max-width: 380px;
-      text-align: center;
+      background: white; padding: 30px 20px; border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center;
     }
-
-    .auth-box h2 {
-      margin-top: 0;
-      color: #6c63ff;
-      margin-bottom: 20px;
-    }
-
+    .auth-box h2 { margin-top: 0; color: #6c63ff; margin-bottom: 20px; }
     .auth-box input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      outline: none;
-      font-size: 15px;
+      width: 100%; padding: 12px; margin-bottom: 15px;
+      border: 1px solid #e0e0e0; border-radius: 8px; font-size: 15px; outline: none;
     }
 
-    /* Sidebar Desktop */
     .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 250px;
-      height: 100vh;
-      background: #ffffff;
-      padding: 25px 15px;
-      box-shadow: 3px 0 15px rgba(0,0,0,0.06);
-      overflow-y: auto;
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      position: fixed; left: 0; top: 0; width: 250px; height: 100vh;
+      background: #ffffff; padding: 25px 15px; box-shadow: 3px 0 15px rgba(0,0,0,0.06);
+      z-index: 100; display: flex; flex-direction: column; justify-content: space-between;
     }
-
-    .logo {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 25px;
-      padding: 0 10px;
-      color: #6c63ff;
-    }
-
+    .logo { font-size: 20px; font-weight: bold; margin-bottom: 25px; color: #6c63ff; }
     .menu a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 15px;
-      margin-bottom: 6px;
-      border-radius: 10px;
-      text-decoration: none;
-      color: #555566;
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
+      display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+      margin-bottom: 6px; border-radius: 10px; color: #555566; font-size: 15px;
+      font-weight: 500; cursor: pointer; text-decoration: none;
     }
+    .menu a.active { background: #eeeaff; color: #6c63ff; font-weight: 600; }
 
-    .menu a:hover,
-    .menu a.active {
-      background: #eeeaff;
-      color: #6c63ff;
-      font-weight: 600;
-    }
-
-    .user-footer {
-      border-top: 1px solid #eee;
-      padding-top: 15px;
-    }
-
-    .user-info {
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-
-    .btn-logout {
-      width: 100%;
-      background: #fff0f0;
-      color: #e63946;
-      border: 1px solid #ffccd5;
-      padding: 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    /* Nav Bar Mobile */
     .mobile-nav {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: white;
-      border-top: 1px solid #eee;
-      padding: 8px 0;
-      z-index: 200;
-      justify-content: space-around;
+      display: none; position: fixed; bottom: 0; left: 0; width: 100%;
+      background: white; border-top: 1px solid #eee; padding: 10px 0;
+      z-index: 200; justify-content: space-around;
     }
-
     .mobile-nav a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 11px;
-      color: #777;
-      text-decoration: none;
-      cursor: pointer;
+      display: flex; flex-direction: column; align-items: center;
+      font-size: 11px; color: #777; text-decoration: none; cursor: pointer;
     }
+    .mobile-nav a.active { color: #6c63ff; font-weight: bold; }
+    .mobile-nav span { font-size: 20px; margin-bottom: 2px; }
 
-    .mobile-nav a.active {
-      color: #6c63ff;
-      font-weight: bold;
+    .main { margin-left: 250px; padding: 30px; }
+    .top h1 { margin: 0 0 8px; font-size: 24px; }
+    .top p { margin: 0 0 20px; color: #777788; font-size: 14px; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .card h3 { margin: 0 0 8px; font-size: 12px; color: #888899; text-transform: uppercase; }
+    .card .value { font-size: 24px; font-weight: bold; }
+
+    .editor-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+    .form-box, .preview-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+    .form-group select, .form-group textarea, .form-group input {
+      width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px;
     }
+    .form-group textarea { height: 90px; }
 
-    .mobile-nav span {
-      font-size: 18px;
-    }
-
-    /* Contenuto Principale */
-    .main {
-      margin-left: 250px;
-      padding: 30px;
-    }
-
-    .top h1 {
-      margin: 0 0 8px;
-      font-size: 24px;
-    }
-
-    .top p {
-      margin: 0 0 20px;
-      color: #777788;
-      font-size: 14px;
-    }
-
-    .section {
-      display: none;
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 12px;
-      color: #888899;
-      text-transform: uppercase;
-    }
-
-    .card .value {
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    /* Layout Editor */
-    .editor-container {
-      display: grid;
-      grid-template-columns: 1fr 350px;
-      gap: 20px;
-    }
-
-    .form-box, .preview-box {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      font-size: 13px;
-    }
-
-    .form-group select,
-    .form-group textarea,
-    .form-group input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 14px;
-    }
-
-    .form-group textarea {
-      height: 100px;
-    }
-
-    .btn-tools {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
+    .btn-tools { display: flex; gap: 10px; margin-bottom: 15px; }
     .btn-ai, .btn-canva {
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      text-align: center;
-      flex: 1;
+      border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 600;
+      cursor: pointer; text-decoration: none; text-align: center; flex: 1;
     }
-
-    .btn-ai {
-      background: #f0ebff;
-      color: #6c63ff;
-      border: 1px solid #6c63ff;
-    }
-
-    .btn-canva {
-      background: #00c4cc;
-      color: white;
-    }
-
+    .btn-ai { background: #f0ebff; color: #6c63ff; border: 1px solid #6c63ff; }
+    .btn-canva { background: #00c4cc; color: white; }
     .btn-primary {
-      background: #6c63ff;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      width: 100%;
+      background: #6c63ff; color: white; border: none; padding: 12px;
+      border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
     }
 
-    .preview-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
+    .preview-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .preview-avatar { width: 36px; height: 36px; border-radius: 50%; background: #6c63ff; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .preview-text { font-size: 13px; line-height: 1.4; white-space: pre-wrap; min-height: 50px; }
+    .preview-media { width: 100%; border-radius: 8px; margin-top: 10px; display: none; max-height: 220px; object-fit: cover; }
 
-    .preview-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #6c63ff;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
+    /* ELENCO POST E NEWSLETTER */
+    .posts-list { display: flex; flex-direction: column; gap: 12px; }
+    .post-card-item {
+      background: white; padding: 15px; border-radius: 12px; border-left: 5px solid #6c63ff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;
     }
-
-    .preview-text {
-      font-size: 13px;
-      line-height: 1.4;
-      white-space: pre-wrap;
-      min-height: 50px;
+    .post-card-item.newsletter-item { border-left-color: #ff9f43; }
+    .post-card-info { font-size: 13px; }
+    .post-card-badge {
+      background: #eeeaff; color: #6c63ff; font-weight: bold; padding: 4px 8px; border-radius: 6px; font-size: 11px;
     }
-
-    .preview-media {
-      width: 100%;
-      border-radius: 8px;
-      margin-top: 10px;
-      display: none;
-      max-height: 220px;
-      object-fit: cover;
-    }
-
-    /* Griglia Calendario */
-    .month-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-    }
-
-    .day-name {
-      font-weight: bold;
-      text-align: center;
-      font-size: 11px;
-      color: #6c63ff;
-      padding-bottom: 5px;
-    }
-
-    .day-square {
-      background: #fdfdfd;
-      border: 1px solid #eee;
-      border-radius: 6px;
-      min-height: 70px;
-      padding: 4px;
-      font-size: 11px;
-      overflow-y: auto;
-    }
-
-    .day-number {
-      font-weight: bold;
-      color: #666;
-      margin-bottom: 4px;
-    }
-
-    .post-tag {
-      background: #eeeaff;
-      color: #6c63ff;
-      padding: 3px 5px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 600;
-      margin-top: 3px;
-      word-break: break-word;
-      line-height: 1.2;
-    }
+    .post-card-badge.badge-nl { background: #fff0e6; color: #ff9f43; }
+    .btn-delete-item { background: #ff4d4f; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
 
     @media (max-width: 768px) {
-      body {
-        padding-bottom: 75px;
-      }
-
-      .sidebar {
-        display: none;
-      }
-
-      .mobile-nav {
-        display: flex;
-      }
-
-      .main {
-        margin-left: 0;
-        padding: 20px 15px;
-      }
-
-      .editor-container {
-        grid-template-columns: 1fr;
-      }
-
-      .day-square {
-        min-height: 55px;
-        padding: 2px;
-      }
-
-      .post-tag {
-        font-size: 8px;
-        padding: 2px 3px;
-      }
+      .sidebar { display: none; }
+      .mobile-nav { display: flex; }
+      .main { margin-left: 0; padding: 20px 15px; }
+      .editor-container { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -411,7 +120,7 @@
   <!-- Login -->
   <div id="auth-screen">
     <div class="auth-box">
-      <h2>🚀 Social Planner Pro</h2>
+      <h2>🚀 Planner Pro</h2>
       <p style="color:#666; font-size:13px; margin-bottom:15px;">Accedi al pannello di controllo</p>
       <input type="text" id="login-username" placeholder="Nome utente">
       <input type="password" id="login-password" placeholder="Password">
@@ -422,28 +131,24 @@
   <!-- Sidebar Desktop -->
   <div class="sidebar">
     <div>
-      <div class="logo">🚀 Social Planner</div>
+      <div class="logo">🚀 Planner Pro</div>
       <div class="menu">
         <a onclick="showSection('dashboard')" id="nav-dashboard" class="active">🏠 Dashboard</a>
-        <a onclick="showSection('calendario')" id="nav-calendario">📅 Calendario</a>
+        <a onclick="showSection('calendario')" id="nav-calendario">📅 Agenda Social</a>
         <a onclick="showSection('crea-post')" id="nav-crea-post">✍️ Crea post</a>
+        <a onclick="showSection('newsletter')" id="nav-newsletter">📧 Newsletter</a>
         <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
-        <a onclick="showSection('impostazioni')" id="nav-impostazioni">⚙️ API Social</a>
       </div>
-    </div>
-    <div class="user-footer">
-      <div class="user-info">👤 <span id="user-display-name">Utente</span></div>
-      <button class="btn-logout" onclick="logout()">Esci</button>
     </div>
   </div>
 
   <!-- Navigation Bar Mobile -->
   <div class="mobile-nav">
     <a onclick="showSection('dashboard')" id="mnav-dashboard" class="active"><span>🏠</span>Home</a>
-    <a onclick="showSection('calendario')" id="mnav-calendario"><span>📅</span>Agenda</a>
-    <a onclick="showSection('crea-post')" id="mnav-crea-post"><span>✍️</span>Crea</a>
+    <a onclick="showSection('calendario')" id="mnav-calendario"><span>📅</span>Social</a>
+    <a onclick="showSection('crea-post')" id="mnav-crea-post"><span>✍️</span>Post</a>
+    <a onclick="showSection('newsletter')" id="mnav-newsletter"><span>📧</span>Mail</a>
     <a onclick="showSection('statistiche')" id="mnav-statistiche"><span>📊</span>Stats</a>
-    <a onclick="showSection('impostazioni')" id="mnav-impostazioni"><span>⚙️</span>API</a>
   </div>
 
   <!-- Contenuto -->
@@ -453,24 +158,24 @@
     <div id="sec-dashboard" class="section active">
       <div class="top">
         <h1>Dashboard</h1>
-        <p>Panoramica dei tuoi contenuti.</p>
+        <p>Panoramica dei tuoi contenuti e invii.</p>
       </div>
       <div class="grid">
         <div class="card">
-          <h3>In Programmazione</h3>
+          <h3>Post Programmati</h3>
           <div class="value" id="count-scheduled">0</div>
         </div>
         <div class="card">
-          <h3>Post Totali</h3>
-          <div class="value" id="count-total">0</div>
+          <h3>Newsletter In Programma</h3>
+          <div class="value" id="count-newsletters">0</div>
         </div>
       </div>
     </div>
 
-    <!-- Crea Post -->
+    <!-- Crea Post Social -->
     <div id="sec-crea-post" class="section">
       <div class="top">
-        <h1>Crea Post</h1>
+        <h1>Crea Post Social</h1>
       </div>
       <div class="editor-container">
         <div class="form-box">
@@ -503,7 +208,7 @@
             <input type="datetime-local" id="post-date">
           </div>
 
-          <button class="btn-primary" onclick="schedulePost()">Salva e Programma</button>
+          <button class="btn-primary" onclick="schedulePost()">Salva e Programma Post</button>
         </div>
 
         <div>
@@ -524,15 +229,53 @@
       </div>
     </div>
 
-    <!-- Calendario -->
+    <!-- Sezione Newsletter -->
+    <div id="sec-newsletter" class="section">
+      <div class="top">
+        <h1>Pianifica Newsletter</h1>
+        <p>Crea e organizza le tue e-mail per gli iscritti.</p>
+      </div>
+
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-group">
+            <label>Oggetto della Mail</label>
+            <input type="text" id="nl-subject" placeholder="Es. 📬 Novità del mese + regalo speciale!">
+          </div>
+
+          <div class="btn-tools">
+            <button class="btn-ai" onclick="generateAiNewsletter()">✨ Bozza AI Newsletter</button>
+          </div>
+
+          <div class="form-group">
+            <label>Contenuto E-mail</label>
+            <textarea id="nl-body" placeholder="Scrivi qui il testo della mail..." style="height:140px;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Data e Ora di Invio</label>
+            <input type="datetime-local" id="nl-date">
+          </div>
+
+          <button class="btn-primary" style="background:#ff9f43;" onclick="scheduleNewsletter()">Programma Newsletter</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Newsletter Pianificate</h3>
+          <div class="posts-list" id="newsletter-container-list">
+            <!-- Elenco Newsletter -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agenda Social -->
     <div id="sec-calendario" class="section">
       <div class="top">
-        <h1>Calendario Editoriale</h1>
+        <h1>Agenda Post Social</h1>
       </div>
-      <div class="month-grid" id="calendar-grid">
-        <div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div>
-        <div class="day-name">G</div><div class="day-name">V</div><div class="day-name">S</div><div class="day-name">D</div>
-        <!-- I giorni da 1 a 31 vengono generati dinamicamente via JS -->
+      <div class="posts-list" id="posts-container-list">
+        <!-- Elenco Post Social -->
       </div>
     </div>
 
@@ -542,20 +285,8 @@
         <h1>Statistiche</h1>
       </div>
       <div class="grid">
-        <div class="card"><h3>Copertura</h3><div class="value">12.4K</div></div>
-        <div class="card"><h3>Interazioni</h3><div class="value">1.8K</div></div>
-      </div>
-    </div>
-
-    <!-- Impostazioni -->
-    <div id="sec-impostazioni" class="section">
-      <div class="top">
-        <h1>Impostazioni API</h1>
-      </div>
-      <div class="card" style="margin-bottom:15px;">
-        <h3 style="color:#25283d; font-size:14px; margin-bottom:8px;">Token Meta / Instagram</h3>
-        <input type="password" id="meta-token" placeholder="Incolla Token Meta..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:10px;">
-        <button class="btn-primary" onclick="saveApiKeys()">Salva</button>
+        <div class="card"><h3>Copertura Social</h3><div class="value">12.4K</div></div>
+        <div class="card"><h3>Tasso Apertura Mail</h3><div class="value">42.8%</div></div>
       </div>
     </div>
 
@@ -563,13 +294,14 @@
 
   <script>
     let scheduledPosts = JSON.parse(localStorage.getItem('sp_posts')) || [];
+    let scheduledNewsletters = JSON.parse(localStorage.getItem('sp_newsletters')) || [];
     let currentMediaBase64 = '';
     let currentMediaType = '';
 
     window.onload = function() {
       checkAuth();
-      buildCalendarGrid();
-      renderCalendarTags();
+      renderPostsList();
+      renderNewslettersList();
       updateDashboardCounts();
     };
 
@@ -577,7 +309,6 @@
       const user = localStorage.getItem('sp_active_user');
       if (user) {
         document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('user-display-name').innerText = user;
       } else {
         document.getElementById('auth-screen').style.display = 'flex';
       }
@@ -585,16 +316,8 @@
 
     function login() {
       const username = document.getElementById('login-username').value;
-      if (!username) {
-        alert('Inserisci un nome utente!');
-        return;
-      }
+      if (!username) { alert('Inserisci un nome utente!'); return; }
       localStorage.setItem('sp_active_user', username);
-      checkAuth();
-    }
-
-    function logout() {
-      localStorage.removeItem('sp_active_user');
       checkAuth();
     }
 
@@ -615,7 +338,6 @@
     function updatePreview() {
       const text = document.getElementById('post-text').value;
       const platform = document.getElementById('channel-select').value;
-
       document.getElementById('preview-content').innerText = text || 'Anteprima testo...';
       document.getElementById('preview-platform').innerText = platform;
     }
@@ -657,29 +379,23 @@
       updatePreview();
     }
 
+    function generateAiNewsletter() {
+      document.getElementById('nl-subject').value = "📬 Idee e ispirazioni speciali per te questo mese!";
+      document.getElementById('nl-body').value = "Ciao!\n\nIn questa nuova newsletter voglio condividerti i dietrolequinte dei progetti a cui sto lavorando.\n\nEcco 3 consigli pratici per questa settimana:\n1. Organizza i tuoi contenuti in anticipo\n2. Dedica tempo alla creatività\n3. Ascolta sempre i pareri della tua community\n\nFammi sapere cosa ne pensi rispondendo a questa mail!\nUn caro saluto.";
+    }
+
     function schedulePost() {
       const platform = document.getElementById('channel-select').value;
       const text = document.getElementById('post-text').value;
       const date = document.getElementById('post-date').value;
 
-      if (!text || !date) {
-        alert('Inserisci un testo e seleziona una data!');
-        return;
-      }
+      if (!text || !date) { alert('Inserisci un testo e seleziona una data!'); return; }
 
-      const newPost = {
-        id: Date.now(),
-        platform,
-        text,
-        date,
-        media: currentMediaBase64,
-        type: currentMediaType
-      };
-
+      const newPost = { id: Date.now(), platform, text, date };
       scheduledPosts.push(newPost);
       localStorage.setItem('sp_posts', JSON.stringify(scheduledPosts));
 
-      renderCalendarTags();
+      renderPostsList();
       updateDashboardCounts();
 
       document.getElementById('post-text').value = '';
@@ -687,70 +403,99 @@
       document.getElementById('post-file').value = '';
       document.getElementById('img-preview').style.display = 'none';
       document.getElementById('video-preview').style.display = 'none';
-      currentMediaBase64 = '';
-      currentMediaType = '';
+      currentMediaBase64 = ''; currentMediaType = '';
       updatePreview();
 
-      alert('Post programmato!');
+      alert('Post salvato in Agenda!');
       showSection('calendario');
     }
 
-    function buildCalendarGrid() {
-      const grid = document.getElementById('calendar-grid');
-      // Mantiene i nomi dei giorni
-      grid.innerHTML = `
-        <div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div>
-        <div class="day-name">G</div><div class="day-name">V</div><div class="day-name">S</div><div class="day-name">D</div>
-      `;
-      // Genera i 31 caselli del mese
-      for (let day = 1; day <= 31; day++) {
-        const square = document.createElement('div');
-        square.className = 'day-square';
-        square.id = 'day-square-' + day;
-        square.innerHTML = `<div class="day-number">${day}</div><div class="post-tags-container"></div>`;
-        grid.appendChild(square);
-      }
+    function scheduleNewsletter() {
+      const subject = document.getElementById('nl-subject').value;
+      const body = document.getElementById('nl-body').value;
+      const date = document.getElementById('nl-date').value;
+
+      if (!subject || !body || !date) { alert('Compila oggetto, testo e data della newsletter!'); return; }
+
+      const newNL = { id: Date.now(), subject, body, date };
+      scheduledNewsletters.push(newNL);
+      localStorage.setItem('sp_newsletters', JSON.stringify(scheduledNewsletters));
+
+      renderNewslettersList();
+      updateDashboardCounts();
+
+      document.getElementById('nl-subject').value = '';
+      document.getElementById('nl-body').value = '';
+      document.getElementById('nl-date').value = '';
+
+      alert('Newsletter programmata con successo!');
     }
 
-    function renderCalendarTags() {
-      // Pulisce tutti i contenitori di post
-      for (let day = 1; day <= 31; day++) {
-        const square = document.getElementById('day-square-' + day);
-        if (square) {
-          const container = square.querySelector('.post-tags-container');
-          if (container) container.innerHTML = '';
-        }
+    function renderPostsList() {
+      const container = document.getElementById('posts-container-list');
+      container.innerHTML = '';
+
+      if (scheduledPosts.length === 0) {
+        container.innerHTML = '<p style="color:#888; text-align:center;">Nessun post programmato.</p>';
+        return;
       }
 
-      // Inserisce ciascun post nel casello del rispettivo giorno
       scheduledPosts.forEach(post => {
-        if (post.date) {
-          const postDateObj = new Date(post.date);
-          const dayNum = postDateObj.getDate();
-          
-          const targetSquare = document.getElementById('day-square-' + dayNum);
-          if (targetSquare) {
-            const container = targetSquare.querySelector('.post-tags-container');
-            if (container) {
-              const tag = document.createElement('div');
-              tag.className = 'post-tag';
-              tag.innerText = `${post.platform}: ${post.text}`;
-              container.appendChild(tag);
-            }
-          }
-        }
+        const item = document.createElement('div');
+        item.className = 'post-card-item';
+        item.innerHTML = `
+          <div class="post-card-info">
+            <span class="post-card-badge">${post.platform}</span>
+            <div style="margin-top:6px; font-weight:600;">${post.text}</div>
+            <small style="color:#777;">Data: ${post.date.replace('T', ' ')}</small>
+          </div>
+          <button class="btn-delete-item" onclick="deletePost(${post.id})">Elimina</button>
+        `;
+        container.appendChild(item);
       });
+    }
+
+    function renderNewslettersList() {
+      const container = document.getElementById('newsletter-container-list');
+      container.innerHTML = '';
+
+      if (scheduledNewsletters.length === 0) {
+        container.innerHTML = '<p style="color:#888; text-align:center;">Nessuna newsletter in programma.</p>';
+        return;
+      }
+
+      scheduledNewsletters.forEach(nl => {
+        const item = document.createElement('div');
+        item.className = 'post-card-item newsletter-item';
+        item.innerHTML = `
+          <div class="post-card-info">
+            <span class="post-card-badge badge-nl">E-mail Newsletter</span>
+            <div style="margin-top:6px; font-weight:600;">${nl.subject}</div>
+            <small style="color:#777;">Invio previsto: ${nl.date.replace('T', ' ')}</small>
+          </div>
+          <button class="btn-delete-item" onclick="deleteNewsletter(${nl.id})">Elimina</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function deletePost(id) {
+      scheduledPosts = scheduledPosts.filter(p => p.id !== id);
+      localStorage.setItem('sp_posts', JSON.stringify(scheduledPosts));
+      renderPostsList();
+      updateDashboardCounts();
+    }
+
+    function deleteNewsletter(id) {
+      scheduledNewsletters = scheduledNewsletters.filter(nl => nl.id !== id);
+      localStorage.setItem('sp_newsletters', JSON.stringify(scheduledNewsletters));
+      renderNewslettersList();
+      updateDashboardCounts();
     }
 
     function updateDashboardCounts() {
       document.getElementById('count-scheduled').innerText = scheduledPosts.length;
-      document.getElementById('count-total').innerText = scheduledPosts.length;
-    }
-
-    function saveApiKeys() {
-      const meta = document.getElementById('meta-token').value;
-      if (meta) localStorage.setItem('sp_meta_token', meta);
-      alert('Token salvato!');
+      document.getElementById('count-newsletters').innerText = scheduledNewsletters.length;
     }
   </script>
 
