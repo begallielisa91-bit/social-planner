@@ -93,7 +93,7 @@
     .preview-text { font-size: 13px; line-height: 1.4; white-space: pre-wrap; min-height: 50px; }
     .preview-media { width: 100%; border-radius: 8px; margin-top: 10px; display: none; max-height: 220px; object-fit: cover; }
 
-    /* ELENCO POST E MAGAZZINO */
+    /* ELENCO SCHEDE */
     .posts-list { display: flex; flex-direction: column; gap: 12px; }
     .post-card-item {
       background: white; padding: 15px; border-radius: 12px; border-left: 5px solid #6c63ff;
@@ -103,6 +103,7 @@
     .post-card-item.income-item { border-left-color: #10b981; }
     .post-card-item.expense-item { border-left-color: #ef4444; }
     .post-card-item.stock-item { border-left-color: #f59e0b; }
+    .post-card-item.book-item { border-left-color: #8b5cf6; }
 
     .post-card-info { font-size: 13px; flex: 1; }
     
@@ -113,6 +114,7 @@
     .post-card-badge.badge-inc { background: #059669; color: #ffffff !important; }
     .post-card-badge.badge-exp { background: #dc2626; color: #ffffff !important; }
     .post-card-badge.badge-stock { background: #d97706; color: #ffffff !important; }
+    .post-card-badge.badge-book { background: #7c3aed; color: #ffffff !important; }
 
     .nl-body-preview {
       background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px;
@@ -151,6 +153,7 @@
         <a onclick="showSection('calendario')" id="nav-calendario">📅 Agenda Social</a>
         <a onclick="showSection('crea-post')" id="nav-crea-post">✍️ Crea post</a>
         <a onclick="showSection('newsletter')" id="nav-newsletter">📧 Newsletter</a>
+        <a onclick="showSection('libri')" id="nav-libri">🏷️ Prezzi Libri</a>
         <a onclick="showSection('magazzino')" id="nav-magazzino">📦 Magazzino & Finanze</a>
         <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
       </div>
@@ -162,7 +165,7 @@
     <a onclick="showSection('dashboard')" id="mnav-dashboard" class="active"><span>🏠</span>Home</a>
     <a onclick="showSection('calendario')" id="mnav-calendario"><span>📅</span>Social</a>
     <a onclick="showSection('crea-post')" id="mnav-crea-post"><span>✍️</span>Post</a>
-    <a onclick="showSection('newsletter')" id="mnav-newsletter"><span>📧</span>Mail</a>
+    <a onclick="showSection('libri')" id="mnav-libri"><span>🏷️</span>Prezzi</a>
     <a onclick="showSection('magazzino')" id="mnav-magazzino"><span>📦</span>Stock</a>
   </div>
 
@@ -185,8 +188,8 @@
           <div class="value" id="count-newsletters">0</div>
         </div>
         <div class="card">
-          <h3>Pezzi in Stock</h3>
-          <div class="value" id="count-stock-total">0</div>
+          <h3>Libri Registrati</h3>
+          <div class="value" id="count-books-total">0</div>
         </div>
         <div class="card">
           <h3>Profitto Netto</h3>
@@ -290,6 +293,65 @@
       </div>
     </div>
 
+    <!-- Sezione Prezzi & Vendite Libri -->
+    <div id="sec-libri" class="section">
+      <div class="top">
+        <h1>🏷️ Prezzi & Vendite Libri</h1>
+        <p>Registra costi di acquisto e modalità di vendita dei tuoi libri.</p>
+      </div>
+
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-group">
+            <label>Titolo del Libro</label>
+            <input type="text" id="bk-title" placeholder="Es. I colori di casa delle filastrocche">
+          </div>
+
+          <div class="form-group">
+            <label>Data di Acquisto / Stampa</label>
+            <input type="date" id="bk-buy-date">
+          </div>
+
+          <div class="form-group">
+            <label>Costo di Acquisto (€)</label>
+            <input type="number" step="0.01" id="bk-buy-price" placeholder="Es. 4.50">
+          </div>
+
+          <div class="form-group">
+            <label>Canale di Vendita</label>
+            <select id="bk-sale-type" onchange="toggleBookSaleFields()">
+              <option value="Amazon">Venduto su Amazon</option>
+              <option value="Persona">Venduto di Persona</option>
+            </select>
+          </div>
+
+          <!-- Campi dinamici per Vendita di Persona -->
+          <div id="bk-person-fields" style="display:none; background:#f8fafc; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #e2e8f0;">
+            <div class="form-group">
+              <label>Data di Vendita</label>
+              <input type="date" id="bk-sale-date">
+            </div>
+            <div class="form-group">
+              <label>Nome del Cliente</label>
+              <input type="text" id="bk-client-name" placeholder="Es. Maria Rossi">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Prezzo di Vendita (€)</label>
+            <input type="number" step="0.01" id="bk-sale-price" placeholder="Es. 12.00">
+          </div>
+
+          <button class="btn-primary" style="background:#7c3aed;" onclick="addBookRecord()">Registra Libro</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Registro Libri & Vendite</h3>
+          <div class="posts-list" id="books-container-list"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Sezione Magazzino & Finanze -->
     <div id="sec-magazzino" class="section">
       <div class="top">
@@ -303,7 +365,7 @@
           <h3 style="margin-top:0; font-size:16px; color:#d97706;">📦 Aggiungi Prodotto in Stock</h3>
           <div class="form-group">
             <label>Nome Prodotto / Articolo</label>
-            <input type="text" id="st-name" placeholder="Es. Libro di Filastrocche / Materiale decoupage">
+            <input type="text" id="st-name" placeholder="Es. Libro / Materiale decoupage">
           </div>
           <div class="form-group">
             <label>Quantità Disponibile</label>
@@ -374,6 +436,7 @@
     let scheduledNewsletters = JSON.parse(localStorage.getItem('sp_newsletters')) || [];
     let stockItems = JSON.parse(localStorage.getItem('sp_stock')) || [];
     let financeItems = JSON.parse(localStorage.getItem('sp_finance')) || [];
+    let bookRecords = JSON.parse(localStorage.getItem('sp_books')) || [];
 
     let currentMediaBase64 = '';
     let currentMediaType = '';
@@ -384,6 +447,7 @@
       renderNewslettersList();
       renderStockList();
       renderFinanceList();
+      renderBooksList();
       updateDashboardCounts();
     };
 
@@ -511,6 +575,105 @@
       document.getElementById('nl-date').value = '';
 
       alert('Newsletter programmata con successo!');
+    }
+
+    /* FUNZIONI PREZZI & VENDITE LIBRI */
+    function toggleBookSaleFields() {
+      const saleType = document.getElementById('bk-sale-type').value;
+      const personFields = document.getElementById('bk-person-fields');
+      personFields.style.display = saleType === 'Persona' ? 'block' : 'none';
+    }
+
+    function addBookRecord() {
+      const title = document.getElementById('bk-title').value;
+      const buyDate = document.getElementById('bk-buy-date').value;
+      const buyPrice = parseFloat(document.getElementById('bk-buy-price').value);
+      const saleType = document.getElementById('bk-sale-type').value;
+      const salePrice = parseFloat(document.getElementById('bk-sale-price').value);
+
+      const saleDate = document.getElementById('bk-sale-date').value;
+      const clientName = document.getElementById('bk-client-name').value;
+
+      if (!title || !buyDate || isNaN(buyPrice) || isNaN(salePrice)) {
+        alert('Compila tutti i campi obbligatori del libro!');
+        return;
+      }
+
+      if (saleType === 'Persona' && (!saleDate || !clientName)) {
+        alert('Inserisci la data di vendita e il nome del cliente per la vendita di persona!');
+        return;
+      }
+
+      const newBook = {
+        id: Date.now(),
+        title,
+        buyDate,
+        buyPrice,
+        saleType,
+        salePrice,
+        saleDate,
+        clientName
+      };
+
+      bookRecords.push(newBook);
+      localStorage.setItem('sp_books', JSON.stringify(bookRecords));
+
+      renderBooksList();
+      updateDashboardCounts();
+
+      document.getElementById('bk-title').value = '';
+      document.getElementById('bk-buy-date').value = '';
+      document.getElementById('bk-buy-price').value = '';
+      document.getElementById('bk-sale-price').value = '';
+      document.getElementById('bk-sale-date').value = '';
+      document.getElementById('bk-client-name').value = '';
+
+      alert('Libro registrato con successo!');
+    }
+
+    function renderBooksList() {
+      const container = document.getElementById('books-container-list');
+      container.innerHTML = '';
+
+      if (bookRecords.length === 0) {
+        container.innerHTML = '<p style="color:#888; text-align:center;">Nessun libro registrato.</p>';
+        return;
+      }
+
+      bookRecords.forEach(bk => {
+        const div = document.createElement('div');
+        div.className = 'post-card-item book-item';
+
+        let saleText = '';
+        if (bk.saleType === 'Amazon') {
+          saleText = `Venduto su <strong>Amazon</strong> a <strong>€${bk.salePrice.toFixed(2)}</strong>`;
+        } else {
+          saleText = `Venduto di persona il <strong>${bk.saleDate}</strong> a <strong>${bk.clientName}</strong> per <strong>€${bk.salePrice.toFixed(2)}</strong>`;
+        }
+
+        const profit = (bk.salePrice - bk.buyPrice).toFixed(2);
+
+        div.innerHTML = `
+          <div class="post-card-info">
+            <span class="post-card-badge badge-book">Libro & Prezzi</span>
+            <div style="margin-top:6px; font-weight:bold; font-size:15px; color:#0f172a;">Libro: ${bk.title}</div>
+            <div style="margin-top:4px; color:#475569;">Acquistato il <strong>${bk.buyDate}</strong> a <strong>€${bk.buyPrice.toFixed(2)}</strong></div>
+            <div style="margin-top:4px; color:#1e293b;">${saleText}</div>
+            <small style="color:${profit >= 0 ? '#059669' : '#dc2626'}; font-weight:bold; display:block; margin-top:6px;">
+              Margine Singolo: €${profit}
+            </small>
+          </div>
+          <button class="btn-delete-item" onclick="deleteBookRecord(${bk.id})">Elimina</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function deleteBookRecord(id) {
+      bookRecords = bookRecords.filter(b => b.id !== id);
+      localStorage.setItem('sp_books', JSON.stringify(bookRecords));
+      renderBooksList();
+      updateDashboardCounts();
     }
 
     /* FUNZIONI MAGAZZINO */
@@ -688,6 +851,7 @@
     function updateDashboardCounts() {
       document.getElementById('count-scheduled').innerText = scheduledPosts.length;
       document.getElementById('count-newsletters').innerText = scheduledNewsletters.length;
+      document.getElementById('count-books-total').innerText = bookRecords.length;
 
       // Calcolo pezzi stock e valore totale
       let totalStockQty = 0;
@@ -696,16 +860,22 @@
         totalStockQty += i.qty;
         totalStockVal += (i.qty * i.price);
       });
-      document.getElementById('count-stock-total').innerText = totalStockQty;
       document.getElementById('stat-stock-value').innerText = '€' + totalStockVal.toFixed(2);
 
-      // Calcolo Profitto Netto
+      // Calcolo Profitto Netto (finanze + margine libri)
       let totalIncome = 0;
       let totalExpense = 0;
+
       financeItems.forEach(f => {
         if (f.type === 'Guadagno') totalIncome += f.amount;
         else totalExpense += f.amount;
       });
+
+      bookRecords.forEach(b => {
+        totalExpense += b.buyPrice;
+        totalIncome += b.salePrice;
+      });
+
       const net = totalIncome - totalExpense;
       const profitElem = document.getElementById('count-profit-net');
       profitElem.innerText = '€' + net.toFixed(2);
