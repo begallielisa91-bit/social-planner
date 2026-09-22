@@ -12,7 +12,7 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f5f7fb;
       color: #25283d;
     }
@@ -28,6 +28,7 @@
       padding: 25px 15px;
       box-shadow: 3px 0 15px rgba(0,0,0,0.06);
       overflow-y: auto;
+      z-index: 100;
     }
 
     .logo {
@@ -36,6 +37,9 @@
       margin-bottom: 30px;
       padding: 0 12px;
       color: #6c63ff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .menu a {
@@ -80,6 +84,15 @@
       color: #777788;
     }
 
+    /* Gestione Sezioni */
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
     /* Dashboard Cards Grid */
     .grid {
       display: grid;
@@ -97,7 +110,7 @@
 
     .card h3 {
       margin: 0 0 10px;
-      font-size: 14px;
+      font-size: 13px;
       color: #888899;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -108,47 +121,296 @@
       font-weight: bold;
       color: #25283d;
     }
+
+    /* Form Crea Post & Anteprima */
+    .editor-container {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 30px;
+    }
+
+    .form-box {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-group select,
+    .form-group textarea,
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-group textarea {
+      height: 140px;
+      resize: vertical;
+    }
+
+    .btn-primary {
+      background: #6c63ff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #574ffd;
+    }
+
+    /* Anteprima Post */
+    .preview-box {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .preview-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #6c63ff;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .preview-text {
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      color: #333;
+      min-height: 80px;
+    }
+
+    /* Calendario bozza */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .day-header {
+      font-weight: bold;
+      text-align: center;
+      padding-bottom: 10px;
+      color: #6c63ff;
+    }
+
+    .day-cell {
+      min-height: 100px;
+      border: 1px dashed #e0e0e0;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 12px;
+    }
   </style>
 </head>
 <body>
 
   <!-- Sidebar -->
   <div class="sidebar">
-    <div class="logo">Social Planner</div>
+    <div class="logo">🚀 Social Planner</div>
     <div class="menu">
-      <a href="#" class="active">🏠 Dashboard</a>
-      <a href="#">📅 Calendario</a>
-      <a href="#">✍️ Crea post</a>
-      <a href="#">🖼️ Media</a>
-      <a href="#">📊 Statistiche</a>
-      <a href="#">👥 Clienti</a>
-      <a href="#">⚙️ Impostazioni</a>
+      <a onclick="showSection('dashboard')" id="nav-dashboard" class="active">🏠 Dashboard</a>
+      <a onclick="showSection('calendario')" id="nav-calendario">📅 Calendario</a>
+      <a onclick="showSection('crea-post')" id="nav-crea-post">✍️ Crea post</a>
+      <a onclick="showSection('media')" id="nav-media">🖼️ Media</a>
+      <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
+      <a onclick="showSection('clienti')" id="nav-clienti">👥 Clienti</a>
+      <a onclick="showSection('impostazioni')" id="nav-impostazioni">⚙️ Impostazioni</a>
     </div>
   </div>
 
   <!-- Contenuto Principale -->
   <div class="main">
-    <div class="top">
-      <h1>Benvenuta nel Social Planner</h1>
-      <p>Gestisci, programma e analizza i tuoi contenuti social da un'unica piattaforma.</p>
+
+    <!-- SEZIONE: Dashboard -->
+    <div id="sec-dashboard" class="section active">
+      <div class="top">
+        <h1>Benvenuta nel Social Planner</h1>
+        <p>Panoramica rapida dei tuoi account e contenuti in programma.</p>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>Post In Programmazione</h3>
+          <div class="value">0</div>
+        </div>
+        <div class="card">
+          <h3>Post Pubblicati</h3>
+          <div class="value">0</div>
+        </div>
+        <div class="card">
+          <h3>Clienti Attivi</h3>
+          <div class="value">1</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Schede di riepilogo rapido -->
-    <div class="grid">
-      <div class="card">
-        <h3>Post In Programmazione</h3>
-        <div class="value">0</div>
+    <!-- SEZIONE: Crea Post -->
+    <div id="sec-crea-post" class="section">
+      <div class="top">
+        <h1>Crea un nuovo post</h1>
+        <p>Prepara il testo, seleziona il canale e guarda l'anteprima in tempo reale.</p>
       </div>
-      <div class="card">
-        <h3>Post Pubblicati</h3>
-        <div class="value">0</div>
-      </div>
-      <div class="card">
-        <h3>Clienti Attivi</h3>
-        <div class="value">0</div>
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-group">
+            <label>Seleziona Canale</label>
+            <select id="channel-select" onchange="updatePreview()">
+              <option value="Instagram">Instagram</option>
+              <option value="Facebook">Facebook</option>
+              <option value="LinkedIn">LinkedIn</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Testo del Post</label>
+            <textarea id="post-text" placeholder="Scrivi qui il tuo messaggio..." oninput="updatePreview()"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Data e Ora di Pubblicazione</label>
+            <input type="datetime-local">
+          </div>
+          <button class="btn-primary" onclick="alert('Post programmato con successo!')">Programma Post</button>
+        </div>
+
+        <!-- Anteprima -->
+        <div>
+          <h3 style="margin-top:0;">Anteprima</h3>
+          <div class="preview-box">
+            <div class="preview-header">
+              <div class="preview-avatar">SP</div>
+              <div>
+                <strong id="preview-account">Il tuo Brand</strong><br>
+                <small id="preview-platform" style="color:#777;">Instagram</small>
+              </div>
+            </div>
+            <div class="preview-text" id="preview-content">Il testo del tuo post apparirà qui...</div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- SEZIONE: Calendario -->
+    <div id="sec-calendario" class="section">
+      <div class="top">
+        <h1>Calendario Editoriale</h1>
+        <p>Visualizza la programmazione della settimana.</p>
+      </div>
+      <div class="calendar-grid">
+        <div class="day-header">Lun</div>
+        <div class="day-header">Mar</div>
+        <div class="day-header">Mer</div>
+        <div class="day-header">Gio</div>
+        <div class="day-header">Ven</div>
+        <div class="day-header">Sab</div>
+        <div class="day-header">Dom</div>
+
+        <div class="day-cell">1</div>
+        <div class="day-cell">2</div>
+        <div class="day-cell">3</div>
+        <div class="day-cell">4</div>
+        <div class="day-cell">5</div>
+        <div class="day-cell">6</div>
+        <div class="day-cell">7</div>
+      </div>
+    </div>
+
+    <!-- SEZIONE: Media -->
+    <div id="sec-media" class="section">
+      <div class="top">
+        <h1>Libreria Media</h1>
+        <p>Qui potrai caricare immagini e video per i tuoi post.</p>
+      </div>
+    </div>
+
+    <!-- SEZIONE: Statistiche -->
+    <div id="sec-statistiche" class="section">
+      <div class="top">
+        <h1>Statistiche</h1>
+        <p>Analisi delle performance dei tuoi contenuti.</p>
+      </div>
+    </div>
+
+    <!-- SEZIONE: Clienti -->
+    <div id="sec-clienti" class="section">
+      <div class="top">
+        <h1>Gestione Clienti / Workspace</h1>
+        <p>Organizza i social per ciascun cliente.</p>
+      </div>
+    </div>
+
+    <!-- SEZIONE: Impostazioni -->
+    <div id="sec-impostazioni" class="section">
+      <div class="top">
+        <h1>Impostazioni</h1>
+        <p>Collega gli account social e gestisci il tuo profilo.</p>
+      </div>
+    </div>
+
   </div>
+
+  <!-- Script JS per far funzionare i clic -->
+  <script>
+    function showSection(sectionId) {
+      // Nasconde tutte le sezioni
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(sec => sec.classList.remove('active'));
+
+      // Rimuove la classe attiva da tutti i menu
+      const navs = document.querySelectorAll('.menu a');
+      navs.forEach(nav => nav.classList.remove('active'));
+
+      // Mostra la sezione selezionata
+      document.getElementById('sec-' + sectionId).classList.add('active');
+      document.getElementById('nav-' + sectionId).classList.add('active');
+    }
+
+    function updatePreview() {
+      const text = document.getElementById('post-text').value;
+      const platform = document.getElementById('channel-select').value;
+
+      document.getElementById('preview-content').innerText = text || 'Il testo del tuo post apparirà qui...';
+      document.getElementById('preview-platform').innerText = platform;
+    }
+  </script>
 
 </body>
 </html>
