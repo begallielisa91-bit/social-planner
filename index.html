@@ -160,8 +160,29 @@
     }
 
     .form-group textarea {
-      height: 140px;
+      height: 120px;
       resize: vertical;
+    }
+
+    .btn-ai {
+      background: #f0ebff;
+      color: #6c63ff;
+      border: 1px solid #6c63ff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-ai:hover {
+      background: #6c63ff;
+      color: white;
     }
 
     .btn-primary {
@@ -214,32 +235,47 @@
       line-height: 1.5;
       white-space: pre-wrap;
       color: #333;
-      min-height: 80px;
+      min-height: 60px;
     }
 
-    /* Calendario bozza */
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-    }
-
-    .day-header {
-      font-weight: bold;
-      text-align: center;
-      padding-bottom: 10px;
-      color: #6c63ff;
-    }
-
-    .day-cell {
-      min-height: 100px;
-      border: 1px dashed #e0e0e0;
+    .preview-image {
+      width: 100%;
       border-radius: 8px;
-      padding: 8px;
+      margin-top: 12px;
+      display: none;
+      max-height: 250px;
+      object-fit: cover;
+    }
+
+    /* Calendario Table */
+    .calendar-table {
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      border-collapse: collapse;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .calendar-table th, .calendar-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    .calendar-table th {
+      background: #fafafa;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
       font-size: 12px;
+      font-weight: 600;
+      background: #eeeaff;
+      color: #6c63ff;
     }
   </style>
 </head>
@@ -271,7 +307,7 @@
       <div class="grid">
         <div class="card">
           <h3>Post In Programmazione</h3>
-          <div class="value">0</div>
+          <div class="value" id="count-scheduled">0</div>
         </div>
         <div class="card">
           <h3>Post Pubblicati</h3>
@@ -288,7 +324,7 @@
     <div id="sec-crea-post" class="section">
       <div class="top">
         <h1>Crea un nuovo post</h1>
-        <p>Prepara il testo, seleziona il canale e guarda l'anteprima in tempo reale.</p>
+        <p>Prepara il testo, aggiungi un'immagine e guarda l'anteprima in tempo reale.</p>
       </div>
       <div class="editor-container">
         <div class="form-box">
@@ -300,29 +336,40 @@
               <option value="LinkedIn">LinkedIn</option>
             </select>
           </div>
+
+          <button class="btn-ai" onclick="generateAiText()">✨ Genera testo con AI</button>
+
           <div class="form-group">
             <label>Testo del Post</label>
             <textarea id="post-text" placeholder="Scrivi qui il tuo messaggio..." oninput="updatePreview()"></textarea>
           </div>
+
+          <div class="form-group">
+            <label>Carica Immagine</label>
+            <input type="file" id="post-image" accept="image/*" onchange="previewImage(event)">
+          </div>
+
           <div class="form-group">
             <label>Data e Ora di Pubblicazione</label>
-            <input type="datetime-local">
+            <input type="datetime-local" id="post-date">
           </div>
-          <button class="btn-primary" onclick="alert('Post programmato con successo!')">Programma Post</button>
+
+          <button class="btn-primary" onclick="schedulePost()">Programma Post</button>
         </div>
 
         <!-- Anteprima -->
         <div>
-          <h3 style="margin-top:0;">Anteprima</h3>
+          <h3 style="margin-top:0;">Anteprima Live</h3>
           <div class="preview-box">
             <div class="preview-header">
               <div class="preview-avatar">SP</div>
               <div>
-                <strong id="preview-account">Il tuo Brand</strong><br>
+                <strong>Il tuo Brand</strong><br>
                 <small id="preview-platform" style="color:#777;">Instagram</small>
               </div>
             </div>
             <div class="preview-text" id="preview-content">Il testo del tuo post apparirà qui...</div>
+            <img id="img-preview" class="preview-image" alt="Anteprima">
           </div>
         </div>
       </div>
@@ -332,73 +379,41 @@
     <div id="sec-calendario" class="section">
       <div class="top">
         <h1>Calendario Editoriale</h1>
-        <p>Visualizza la programmazione della settimana.</p>
+        <p>Elenco dei post salvati in programmazione.</p>
       </div>
-      <div class="calendar-grid">
-        <div class="day-header">Lun</div>
-        <div class="day-header">Mar</div>
-        <div class="day-header">Mer</div>
-        <div class="day-header">Gio</div>
-        <div class="day-header">Ven</div>
-        <div class="day-header">Sab</div>
-        <div class="day-header">Dom</div>
 
-        <div class="day-cell">1</div>
-        <div class="day-cell">2</div>
-        <div class="day-cell">3</div>
-        <div class="day-cell">4</div>
-        <div class="day-cell">5</div>
-        <div class="day-cell">6</div>
-        <div class="day-cell">7</div>
-      </div>
+      <table class="calendar-table">
+        <thead>
+          <tr>
+            <th>Canale</th>
+            <th>Contenuto</th>
+            <th>Data e Ora</th>
+            <th>Stato</th>
+          </tr>
+        </thead>
+        <tbody id="calendar-list">
+          <tr>
+            <td colspan="4" style="text-align:center; color:#888;">Nessun post programmato.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- SEZIONE: Media -->
-    <div id="sec-media" class="section">
-      <div class="top">
-        <h1>Libreria Media</h1>
-        <p>Qui potrai caricare immagini e video per i tuoi post.</p>
-      </div>
-    </div>
-
-    <!-- SEZIONE: Statistiche -->
-    <div id="sec-statistiche" class="section">
-      <div class="top">
-        <h1>Statistiche</h1>
-        <p>Analisi delle performance dei tuoi contenuti.</p>
-      </div>
-    </div>
-
-    <!-- SEZIONE: Clienti -->
-    <div id="sec-clienti" class="section">
-      <div class="top">
-        <h1>Gestione Clienti / Workspace</h1>
-        <p>Organizza i social per ciascun cliente.</p>
-      </div>
-    </div>
-
-    <!-- SEZIONE: Impostazioni -->
-    <div id="sec-impostazioni" class="section">
-      <div class="top">
-        <h1>Impostazioni</h1>
-        <p>Collega gli account social e gestisci il tuo profilo.</p>
-      </div>
-    </div>
+    <!-- Altre Sezioni -->
+    <div id="sec-media" class="section"><div class="top"><h1>Libreria Media</h1><p>Spazio per caricare e organizzare le tue immagini.</p></div></div>
+    <div id="sec-statistiche" class="section"><div class="top"><h1>Statistiche</h1><p>Analisi della crescita dei tuoi profili.</p></div></div>
+    <div id="sec-clienti" class="section"><div class="top"><h1>Clienti / Workspace</h1><p>Gestione dei brand collegati.</p></div></div>
+    <div id="sec-impostazioni" class="section"><div class="top"><h1>Impostazioni</h1><p>Configura le tue API e opzioni del profilo.</p></div></div>
 
   </div>
 
-  <!-- Script JS per far funzionare i clic -->
   <script>
+    let scheduledPosts = [];
+
     function showSection(sectionId) {
-      // Nasconde tutte le sezioni
-      const sections = document.querySelectorAll('.section');
-      sections.forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.menu a').forEach(nav => nav.classList.remove('active'));
 
-      // Rimuove la classe attiva da tutti i menu
-      const navs = document.querySelectorAll('.menu a');
-      navs.forEach(nav => nav.classList.remove('active'));
-
-      // Mostra la sezione selezionata
       document.getElementById('sec-' + sectionId).classList.add('active');
       document.getElementById('nav-' + sectionId).classList.add('active');
     }
@@ -409,6 +424,79 @@
 
       document.getElementById('preview-content').innerText = text || 'Il testo del tuo post apparirà qui...';
       document.getElementById('preview-platform').innerText = platform;
+    }
+
+    function previewImage(event) {
+      const imgElement = document.getElementById('img-preview');
+      const file = event.target.files[0];
+      if (file) {
+        imgElement.src = URL.createObjectURL(file);
+        imgElement.style.display = 'block';
+      } else {
+        imgElement.style.display = 'none';
+      }
+    }
+
+    function generateAiText() {
+      const suggestions = [
+        "✨ Novità in arrivo! Stiamo lavorando a qualcosa di speciale per voi. Restate sintonizzati! 🚀 #socialplanner #news #creativita",
+        "💡 Consiglio del giorno: La costanza nella pubblicazione è la chiave per far crescere la tua community. Tu ogni quanto pubblichi? 👇 #socialmediamarketing #tips",
+        "🎉 Buon inizio settimana a tutti! Quali sono i tuoi obiettivi per questi prossimi giorni? Scrivimelo nei commenti! ☕ #motivation #mondayvibes"
+      ];
+      const randomText = suggestions[Math.floor(Math.random() * suggestions.length)];
+      document.getElementById('post-text').value = randomText;
+      updatePreview();
+    }
+
+    function schedulePost() {
+      const platform = document.getElementById('channel-select').value;
+      const text = document.getElementById('post-text').value;
+      const date = document.getElementById('post-date').value;
+
+      if (!text || !date) {
+        alert('Inserisci un testo e seleziona una data!');
+        return;
+      }
+
+      // Salva il post
+      scheduledPosts.push({ platform, text, date });
+
+      // Aggiorna contatore Dashboard
+      document.getElementById('count-scheduled').innerText = scheduledPosts.length;
+
+      // Aggiorna Tabella Calendario
+      renderCalendar();
+
+      // Reset Form
+      document.getElementById('post-text').value = '';
+      document.getElementById('post-date').value = '';
+      document.getElementById('post-image').value = '';
+      document.getElementById('img-preview').style.display = 'none';
+      updatePreview();
+
+      alert('Post programmato con successo!');
+      showSection('calendario');
+    }
+
+    function renderCalendar() {
+      const tbody = document.getElementById('calendar-list');
+      tbody.innerHTML = '';
+
+      if (scheduledPosts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">Nessun post programmato.</td></tr>';
+        return;
+      }
+
+      scheduledPosts.forEach(post => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${post.platform}</strong></td>
+          <td>${post.text.substring(0, 40)}...</td>
+          <td>${post.date.replace('T', ' ')}</td>
+          <td><span class="badge">Programmato</span></td>
+        `;
+        tbody.appendChild(row);
+      });
     }
   </script>
 
