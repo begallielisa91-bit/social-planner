@@ -17,6 +17,46 @@
       color: #25283d;
     }
 
+    /* Auth Modal Screen */
+    #auth-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #f5f7fb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .auth-box {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .auth-box h2 {
+      margin-top: 0;
+      color: #6c63ff;
+      margin-bottom: 20px;
+    }
+
+    .auth-box input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+    }
+
     /* Sidebar Navigation */
     .sidebar {
       position: fixed;
@@ -29,6 +69,9 @@
       box-shadow: 3px 0 15px rgba(0,0,0,0.06);
       overflow-y: auto;
       z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .logo {
@@ -61,6 +104,31 @@
     .menu a.active {
       background: #eeeaff;
       color: #6c63ff;
+      font-weight: 600;
+    }
+
+    .user-footer {
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+      margin-top: 20px;
+    }
+
+    .user-info {
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+      padding: 0 10px;
+    }
+
+    .btn-logout {
+      width: 100%;
+      background: #fff0f0;
+      color: #e63946;
+      border: 1px solid #ffccd5;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
       font-weight: 600;
     }
 
@@ -392,17 +460,35 @@
 </head>
 <body>
 
+  <!-- Schermata di Autenticazione (Login) -->
+  <div id="auth-screen">
+    <div class="auth-box">
+      <h2>🚀 Social Planner Pro</h2>
+      <p style="color:#666; font-size:14px; margin-bottom:20px;">Accedi al tuo pannello di controllo</p>
+      <input type="text" id="login-username" placeholder="Nome utente o Email">
+      <input type="password" id="login-password" placeholder="Password">
+      <button class="btn-primary" onclick="login()">Accedi</button>
+    </div>
+  </div>
+
   <!-- Sidebar -->
   <div class="sidebar">
-    <div class="logo">🚀 Social Planner</div>
-    <div class="menu">
-      <a onclick="showSection('dashboard')" id="nav-dashboard" class="active">🏠 Dashboard</a>
-      <a onclick="showSection('calendario')" id="nav-calendario">📅 Calendario</a>
-      <a onclick="showSection('crea-post')" id="nav-crea-post">✍️ Crea post</a>
-      <a onclick="showSection('media')" id="nav-media">🖼️ Media / Canva</a>
-      <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
-      <a onclick="showSection('piani')" id="nav-piani">💎 Piani & Prezzi</a>
-      <a onclick="showSection('impostazioni')" id="nav-impostazioni">⚙️ Impostazioni API</a>
+    <div>
+      <div class="logo">🚀 Social Planner</div>
+      <div class="menu">
+        <a onclick="showSection('dashboard')" id="nav-dashboard" class="active">🏠 Dashboard</a>
+        <a onclick="showSection('calendario')" id="nav-calendario">📅 Calendario</a>
+        <a onclick="showSection('crea-post')" id="nav-crea-post">✍️ Crea post</a>
+        <a onclick="showSection('media')" id="nav-media">🖼️ Media / Canva</a>
+        <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
+        <a onclick="showSection('piani')" id="nav-piani">💎 Piani & Prezzi</a>
+        <a onclick="showSection('impostazioni')" id="nav-impostazioni">⚙️ Impostazioni API</a>
+      </div>
+    </div>
+
+    <div class="user-footer">
+      <div class="user-info">👤 <span id="user-display-name">Utente</span></div>
+      <button class="btn-logout" onclick="logout()">Esci</button>
     </div>
   </div>
 
@@ -506,7 +592,6 @@
         <div class="day-name">Sab</div>
         <div class="day-name">Dom</div>
 
-        <!-- Griglia di esempio giorni -->
         <div class="day-square"><div class="day-num">1</div></div>
         <div class="day-square"><div class="day-num">2</div></div>
         <div class="day-square"><div class="day-num">3</div></div>
@@ -645,9 +730,35 @@
     let currentMediaType = '';
 
     window.onload = function() {
+      checkAuth();
       renderCalendarTags();
       updateDashboardCounts();
     };
+
+    function checkAuth() {
+      const user = localStorage.getItem('sp_active_user');
+      if (user) {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('user-display-name').innerText = user;
+      } else {
+        document.getElementById('auth-screen').style.display = 'flex';
+      }
+    }
+
+    function login() {
+      const username = document.getElementById('login-username').value;
+      if (!username) {
+        alert('Inserisci un nome utente!');
+        return;
+      }
+      localStorage.setItem('sp_active_user', username);
+      checkAuth();
+    }
+
+    function logout() {
+      localStorage.removeItem('sp_active_user');
+      checkAuth();
+    }
 
     function showSection(sectionId) {
       document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
