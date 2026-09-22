@@ -81,10 +81,10 @@
       border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 600;
       cursor: pointer; text-decoration: none; text-align: center; flex: 1;
     }
-    .btn-ai { background: #6c63ff; color: white; }
-    .btn-canva { background: #00c4cc; color: white; }
+    .btn-ai { background: #6c63ff; color: #ffffff !important; }
+    .btn-canva { background: #00c4cc; color: #ffffff !important; }
     .btn-primary {
-      background: #6c63ff; color: white; border: none; padding: 12px;
+      background: #6c63ff; color: #ffffff !important; border: none; padding: 12px;
       border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
     }
 
@@ -97,18 +97,25 @@
     .posts-list { display: flex; flex-direction: column; gap: 12px; }
     .post-card-item {
       background: white; padding: 15px; border-radius: 12px; border-left: 5px solid #6c63ff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
     }
-    .post-card-item.newsletter-item { border-left-color: #d97706; }
-    .post-card-info { font-size: 13px; }
+    .post-card-item.newsletter-item { border-left-color: #0284c7; }
+    .post-card-info { font-size: 13px; flex: 1; }
     
-    /* BADGE AD ALTO CONTRASTO */
+    /* BADGE LEGGI
+    BILI */
     .post-card-badge {
-      background: #5b21b6; color: #ffffff; font-weight: bold; padding: 4px 8px; border-radius: 6px; font-size: 12px; display: inline-block;
+      background: #4c1d95; color: #ffffff !important; font-weight: bold; padding: 5px 10px; border-radius: 6px; font-size: 12px; display: inline-block;
     }
-    .post-card-badge.badge-nl { background: #b45309; color: #ffffff; }
+    .post-card-badge.badge-nl { background: #0369a1; color: #ffffff !important; }
 
-    .btn-delete-item { background: #ff4d4f; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+    /* RQUADRO TESTO MAIL */
+    .nl-body-preview {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px;
+      font-size: 13px; color: #1e293b; line-height: 1.4; white-space: pre-wrap; word-break: break-word;
+    }
+
+    .btn-delete-item { background: #ff4d4f; color: #ffffff !important; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; }
 
     @media (max-width: 768px) {
       .sidebar { display: none; }
@@ -260,7 +267,7 @@
             <input type="datetime-local" id="nl-date">
           </div>
 
-          <button class="btn-primary" style="background:#d97706;" onclick="scheduleNewsletter()">Programma Newsletter</button>
+          <button class="btn-primary" style="background:#0284c7;" onclick="scheduleNewsletter()">Programma Newsletter</button>
         </div>
 
         <div>
@@ -384,7 +391,7 @@
 
     function generateAiNewsletter() {
       document.getElementById('nl-subject').value = "📬 Idee e ispirazioni speciali per te questo mese!";
-      document.getElementById('nl-body').value = "Ciao!\n\nIn questa nuova newsletter voglio condividerti i dietrolequinte dei progetti a cui sto lavorando.\n\nEcco 3 consigli pratici per questa settimana:\n1. Organizza i tuoi contenuti in anticipo\n2. Dedica tempo alla creatività\n3. Ascolta sempre i pareri della tua community\n\nFammi sapere cosa ne pensi rispondendo a questa mail!\nUn caro saluto.";
+      document.getElementById('nl-body').value = "Ciao!\n\nIn questa nuova newsletter voglio condividerti i retroscena dei progetti a cui sto lavorando.\n\nEcco 3 consigli pratici per questa settimana:\n1. Organizza i tuoi contenuti in anticipo\n2. Dedica tempo alla creatività\n3. Ascolta sempre i pareri della tua community\n\nFammi sapere cosa ne pensi rispondendo a questa mail!\nUn caro saluto.";
     }
 
     function schedulePost() {
@@ -473,8 +480,9 @@
         item.innerHTML = `
           <div class="post-card-info">
             <span class="post-card-badge badge-nl">E-mail Newsletter</span>
-            <div style="margin-top:6px; font-weight:600;">${nl.subject}</div>
-            <small style="color:#777;">Invio previsto: ${nl.date.replace('T', ' ')}</small>
+            <div style="margin-top:6px; font-weight:bold; font-size:14px; color:#0f172a;">${nl.subject}</div>
+            <div class="nl-body-preview">${nl.body}</div>
+            <small style="color:#64748b; display:block; margin-top:6px;">Invio previsto: ${nl.date.replace('T', ' ')}</small>
           </div>
           <button class="btn-delete-item" onclick="deleteNewsletter(${nl.id})">Elimina</button>
         `;
