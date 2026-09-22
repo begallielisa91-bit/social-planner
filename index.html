@@ -81,7 +81,7 @@
       border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 600;
       cursor: pointer; text-decoration: none; text-align: center; flex: 1;
     }
-    .btn-ai { background: #f0ebff; color: #6c63ff; border: 1px solid #6c63ff; }
+    .btn-ai { background: #6c63ff; color: white; }
     .btn-canva { background: #00c4cc; color: white; }
     .btn-primary {
       background: #6c63ff; color: white; border: none; padding: 12px;
@@ -99,12 +99,15 @@
       background: white; padding: 15px; border-radius: 12px; border-left: 5px solid #6c63ff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;
     }
-    .post-card-item.newsletter-item { border-left-color: #ff9f43; }
+    .post-card-item.newsletter-item { border-left-color: #d97706; }
     .post-card-info { font-size: 13px; }
+    
+    /* BADGE AD ALTO CONTRASTO */
     .post-card-badge {
-      background: #eeeaff; color: #6c63ff; font-weight: bold; padding: 4px 8px; border-radius: 6px; font-size: 11px;
+      background: #5b21b6; color: #ffffff; font-weight: bold; padding: 4px 8px; border-radius: 6px; font-size: 12px; display: inline-block;
     }
-    .post-card-badge.badge-nl { background: #fff0e6; color: #ff9f43; }
+    .post-card-badge.badge-nl { background: #b45309; color: #ffffff; }
+
     .btn-delete-item { background: #ff4d4f; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
 
     @media (max-width: 768px) {
@@ -257,7 +260,7 @@
             <input type="datetime-local" id="nl-date">
           </div>
 
-          <button class="btn-primary" style="background:#ff9f43;" onclick="scheduleNewsletter()">Programma Newsletter</button>
+          <button class="btn-primary" style="background:#d97706;" onclick="scheduleNewsletter()">Programma Newsletter</button>
         </div>
 
         <div>
