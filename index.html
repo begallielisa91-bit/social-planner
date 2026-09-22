@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Social Planner</title>
+  <title>Social Planner Pro</title>
 
   <style>
     * {
@@ -164,25 +164,44 @@
       resize: vertical;
     }
 
-    .btn-ai {
-      background: #f0ebff;
-      color: #6c63ff;
-      border: 1px solid #6c63ff;
-      padding: 8px 14px;
+    .btn-tools {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .btn-ai, .btn-canva {
+      border: none;
+      padding: 9px 14px;
       border-radius: 6px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      margin-bottom: 15px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
       transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-ai {
+      background: #f0ebff;
+      color: #6c63ff;
+      border: 1px solid #6c63ff;
     }
 
     .btn-ai:hover {
       background: #6c63ff;
       color: white;
+    }
+
+    .btn-canva {
+      background: #00c4cc;
+      color: white;
+    }
+
+    .btn-canva:hover {
+      background: #00a0a6;
     }
 
     .btn-primary {
@@ -277,6 +296,24 @@
       background: #eeeaff;
       color: #6c63ff;
     }
+
+    .btn-delete {
+      background: #ff4d4f;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .api-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
   </style>
 </head>
 <body>
@@ -288,10 +325,10 @@
       <a onclick="showSection('dashboard')" id="nav-dashboard" class="active">🏠 Dashboard</a>
       <a onclick="showSection('calendario')" id="nav-calendario">📅 Calendario</a>
       <a onclick="showSection('crea-post')" id="nav-crea-post">✍️ Crea post</a>
-      <a onclick="showSection('media')" id="nav-media">🖼️ Media</a>
+      <a onclick="showSection('media')" id="nav-media">🖼️ Media / Canva</a>
       <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
       <a onclick="showSection('clienti')" id="nav-clienti">👥 Clienti</a>
-      <a onclick="showSection('impostazioni')" id="nav-impostazioni">⚙️ Impostazioni</a>
+      <a onclick="showSection('impostazioni')" id="nav-impostazioni">⚙️ Impostazioni API</a>
     </div>
   </div>
 
@@ -302,7 +339,7 @@
     <div id="sec-dashboard" class="section active">
       <div class="top">
         <h1>Benvenuta nel Social Planner</h1>
-        <p>Panoramica rapida dei tuoi account e contenuti in programma.</p>
+        <p>Panoramica dei tuoi contenuti registrati e sincronizzati.</p>
       </div>
       <div class="grid">
         <div class="card">
@@ -310,12 +347,12 @@
           <div class="value" id="count-scheduled">0</div>
         </div>
         <div class="card">
-          <h3>Post Pubblicati</h3>
-          <div class="value">0</div>
+          <h3>Post Salvati Totali</h3>
+          <div class="value" id="count-total">0</div>
         </div>
         <div class="card">
-          <h3>Clienti Attivi</h3>
-          <div class="value">1</div>
+          <h3>Canali Collegati</h3>
+          <div class="value" id="count-connected">3</div>
         </div>
       </div>
     </div>
@@ -324,12 +361,12 @@
     <div id="sec-crea-post" class="section">
       <div class="top">
         <h1>Crea un nuovo post</h1>
-        <p>Prepara il testo, aggiungi un'immagine e guarda l'anteprima in tempo reale.</p>
+        <p>Genera testo con AI, usa Canva o carica immagini per la programmazione.</p>
       </div>
       <div class="editor-container">
         <div class="form-box">
           <div class="form-group">
-            <label>Seleziona Canale</label>
+            <label>Seleziona Canale Social</label>
             <select id="channel-select" onchange="updatePreview()">
               <option value="Instagram">Instagram</option>
               <option value="Facebook">Facebook</option>
@@ -337,11 +374,14 @@
             </select>
           </div>
 
-          <button class="btn-ai" onclick="generateAiText()">✨ Genera testo con AI</button>
+          <div class="btn-tools">
+            <button class="btn-ai" onclick="generateAiText()">✨ Genera con AI</button>
+            <a class="btn-canva" href="https://www.canva.com" target="_blank">🎨 Apri Canva</a>
+          </div>
 
           <div class="form-group">
             <label>Testo del Post</label>
-            <textarea id="post-text" placeholder="Scrivi qui il tuo messaggio..." oninput="updatePreview()"></textarea>
+            <textarea id="post-text" placeholder="Scrivi il post o usa l'AI..." oninput="updatePreview()"></textarea>
           </div>
 
           <div class="form-group">
@@ -354,7 +394,7 @@
             <input type="datetime-local" id="post-date">
           </div>
 
-          <button class="btn-primary" onclick="schedulePost()">Programma Post</button>
+          <button class="btn-primary" onclick="schedulePost()">Programma e Salva Post</button>
         </div>
 
         <!-- Anteprima -->
@@ -379,7 +419,7 @@
     <div id="sec-calendario" class="section">
       <div class="top">
         <h1>Calendario Editoriale</h1>
-        <p>Elenco dei post salvati in programmazione.</p>
+        <p>I tuoi post sono memorizzati in modo permanente nel sistema.</p>
       </div>
 
       <table class="calendar-table">
@@ -389,26 +429,71 @@
             <th>Contenuto</th>
             <th>Data e Ora</th>
             <th>Stato</th>
+            <th>Azione</th>
           </tr>
         </thead>
         <tbody id="calendar-list">
-          <tr>
-            <td colspan="4" style="text-align:center; color:#888;">Nessun post programmato.</td>
-          </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Altre Sezioni -->
-    <div id="sec-media" class="section"><div class="top"><h1>Libreria Media</h1><p>Spazio per caricare e organizzare le tue immagini.</p></div></div>
-    <div id="sec-statistiche" class="section"><div class="top"><h1>Statistiche</h1><p>Analisi della crescita dei tuoi profili.</p></div></div>
-    <div id="sec-clienti" class="section"><div class="top"><h1>Clienti / Workspace</h1><p>Gestione dei brand collegati.</p></div></div>
-    <div id="sec-impostazioni" class="section"><div class="top"><h1>Impostazioni</h1><p>Configura le tue API e opzioni del profilo.</p></div></div>
+    <!-- SEZIONE: Media -->
+    <div id="sec-media" class="section">
+      <div class="top">
+        <h1>Libreria Media & Canva</h1>
+        <p>Crea la grafica del tuo brand su Canva ed e-importala nei post.</p>
+        <a class="btn-canva" href="https://www.canva.com" target="_blank" style="padding:12px 20px;">🎨 Apri Studio Canva</a>
+      </div>
+    </div>
+
+    <!-- SEZIONE: Statistiche -->
+    <div id="sec-statistiche" class="section">
+      <div class="top">
+        <h1>Statistiche</h1>
+        <p>Analisi della crescita dei tuoi profili.</p>
+      </div>
+    </div>
+
+    <!-- SEZIONE: Clienti -->
+    <div id="sec-clienti" class="section">
+      <div class="top">
+        <h1>Clienti / Workspace</h1>
+        <p>Gestione account separati.</p>
+      </div>
+    </div>
+
+    <!-- SEZIONE: Impostazioni API Social -->
+    <div id="sec-impostazioni" class="section">
+      <div class="top">
+        <h1>Integrazione API Social Network</h1>
+        <p>Incolla qui i tuoi Access Token di sviluppo per collegare i profili ufficiali Meta e LinkedIn.</p>
+      </div>
+
+      <div class="api-card">
+        <h3>📸 Meta / Instagram Graph API</h3>
+        <p style="font-size:13px; color:#666;">Richiede Access Token rilasciato da Meta for Developers.</p>
+        <input type="password" id="meta-token" placeholder="Incolla Meta Access Token..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:10px;">
+        <button class="btn-primary" style="width:auto;" onclick="saveApiKeys()">Salva Token Meta</button>
+      </div>
+
+      <div class="api-card">
+        <h3>💼 LinkedIn API</h3>
+        <p style="font-size:13px; color:#666;">Richiede Access Token dell'applicazione LinkedIn Developer.</p>
+        <input type="password" id="linkedin-token" placeholder="Incolla LinkedIn Access Token..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-bottom:10px;">
+        <button class="btn-primary" style="width:auto;" onclick="saveApiKeys()">Salva Token LinkedIn</button>
+      </div>
+    </div>
 
   </div>
 
   <script>
-    let scheduledPosts = [];
+    let scheduledPosts = JSON.parse(localStorage.getItem('sp_posts')) || [];
+    let currentImageBase64 = '';
+
+    window.onload = function() {
+      renderCalendar();
+      updateDashboardCounts();
+    };
 
     function showSection(sectionId) {
       document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
@@ -427,13 +512,16 @@
     }
 
     function previewImage(event) {
-      const imgElement = document.getElementById('img-preview');
       const file = event.target.files[0];
       if (file) {
-        imgElement.src = URL.createObjectURL(file);
-        imgElement.style.display = 'block';
-      } else {
-        imgElement.style.display = 'none';
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          currentImageBase64 = e.target.result;
+          const imgElement = document.getElementById('img-preview');
+          imgElement.src = currentImageBase64;
+          imgElement.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
       }
     }
 
@@ -458,24 +546,37 @@
         return;
       }
 
-      // Salva il post
-      scheduledPosts.push({ platform, text, date });
+      const newPost = {
+        id: Date.now(),
+        platform,
+        text,
+        date,
+        image: currentImageBase64
+      };
 
-      // Aggiorna contatore Dashboard
-      document.getElementById('count-scheduled').innerText = scheduledPosts.length;
+      scheduledPosts.push(newPost);
+      localStorage.setItem('sp_posts', JSON.stringify(scheduledPosts));
 
-      // Aggiorna Tabella Calendario
       renderCalendar();
+      updateDashboardCounts();
 
       // Reset Form
       document.getElementById('post-text').value = '';
       document.getElementById('post-date').value = '';
       document.getElementById('post-image').value = '';
       document.getElementById('img-preview').style.display = 'none';
+      currentImageBase64 = '';
       updatePreview();
 
-      alert('Post programmato con successo!');
+      alert('Post programmato e salvato con successo!');
       showSection('calendario');
+    }
+
+    function deletePost(id) {
+      scheduledPosts = scheduledPosts.filter(p => p.id !== id);
+      localStorage.setItem('sp_posts', JSON.stringify(scheduledPosts));
+      renderCalendar();
+      updateDashboardCounts();
     }
 
     function renderCalendar() {
@@ -483,7 +584,7 @@
       tbody.innerHTML = '';
 
       if (scheduledPosts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">Nessun post programmato.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">Nessun post salvato.</td></tr>';
         return;
       }
 
@@ -493,10 +594,24 @@
           <td><strong>${post.platform}</strong></td>
           <td>${post.text.substring(0, 40)}...</td>
           <td>${post.date.replace('T', ' ')}</td>
-          <td><span class="badge">Programmato</span></td>
+          <td><span class="badge">Salvato</span></td>
+          <td><button class="btn-delete" onclick="deletePost(${post.id})">Elimina</button></td>
         `;
         tbody.appendChild(row);
       });
+    }
+
+    function updateDashboardCounts() {
+      document.getElementById('count-scheduled').innerText = scheduledPosts.length;
+      document.getElementById('count-total').innerText = scheduledPosts.length;
+    }
+
+    function saveApiKeys() {
+      const meta = document.getElementById('meta-token').value;
+      const linkedin = document.getElementById('linkedin-token').value;
+      if (meta) localStorage.setItem('sp_meta_token', meta);
+      if (linkedin) localStorage.setItem('sp_linkedin_token', linkedin);
+      alert('Token salvati con successo nel tuo browser!');
     }
   </script>
 
