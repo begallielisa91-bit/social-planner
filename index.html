@@ -15,7 +15,7 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: #f5f7fb;
       color: #25283d;
-      padding-bottom: 70px; /* Spazio per la nav bar mobile */
+      padding-bottom: 70px;
     }
 
     /* Schermata Login */
@@ -59,7 +59,7 @@
       font-size: 15px;
     }
 
-    /* Sidebar Navigation (Desktop) */
+    /* Sidebar Desktop */
     .sidebar {
       position: fixed;
       left: 0;
@@ -127,7 +127,7 @@
       font-weight: 600;
     }
 
-    /* Navigation Bar Infeirore (Mobile) */
+    /* Nav Bar Mobile */
     .mobile-nav {
       display: none;
       position: fixed;
@@ -348,36 +348,41 @@
       background: #fdfdfd;
       border: 1px solid #eee;
       border-radius: 6px;
-      min-height: 60px;
+      min-height: 70px;
       padding: 4px;
       font-size: 11px;
+      overflow-y: auto;
+    }
+
+    .day-number {
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 4px;
     }
 
     .post-tag {
       background: #eeeaff;
       color: #6c63ff;
-      padding: 2px 4px;
-      border-radius: 3px;
-      font-size: 9px;
+      padding: 3px 5px;
+      border-radius: 4px;
+      font-size: 10px;
       font-weight: 600;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      margin-top: 3px;
+      word-break: break-word;
+      line-height: 1.2;
     }
 
-    /* REGOLAZIONI PER SCHERMI PICCOLI (MOBILE) */
     @media (max-width: 768px) {
       body {
         padding-bottom: 75px;
       }
 
       .sidebar {
-        display: none; /* Nasconde la sidebar su smartphone */
+        display: none;
       }
 
       .mobile-nav {
-        display: flex; /* Mostra la barra inferiore */
+        display: flex;
       }
 
       .main {
@@ -386,16 +391,17 @@
       }
 
       .editor-container {
-        grid-template-columns: 1fr; /* Mette editor e anteprima in verticale */
+        grid-template-columns: 1fr;
       }
 
       .day-square {
-        min-height: 45px;
+        min-height: 55px;
         padding: 2px;
       }
 
       .post-tag {
         font-size: 8px;
+        padding: 2px 3px;
       }
     }
   </style>
@@ -431,7 +437,7 @@
     </div>
   </div>
 
-  <!-- Navigation Bar Mobile (in basso) -->
+  <!-- Navigation Bar Mobile -->
   <div class="mobile-nav">
     <a onclick="showSection('dashboard')" id="mnav-dashboard" class="active"><span>🏠</span>Home</a>
     <a onclick="showSection('calendario')" id="mnav-calendario"><span>📅</span>Agenda</a>
@@ -521,23 +527,12 @@
     <!-- Calendario -->
     <div id="sec-calendario" class="section">
       <div class="top">
-        <h1>Calendario</h1>
+        <h1>Calendario Editoriale</h1>
       </div>
-      <div class="month-grid">
+      <div class="month-grid" id="calendar-grid">
         <div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div>
         <div class="day-name">G</div><div class="day-name">V</div><div class="day-name">S</div><div class="day-name">D</div>
-
-        <div class="day-square">1</div><div class="day-square">2</div><div class="day-square">3</div>
-        <div class="day-square">4</div><div class="day-square">5</div><div class="day-square">6</div>
-        <div class="day-square">7</div><div class="day-square">8</div><div class="day-square">9</div>
-        <div class="day-square">10</div><div class="day-square">11</div><div class="day-square">12</div>
-        <div class="day-square">13</div><div class="day-square">14</div><div class="day-square">15</div>
-        <div class="day-square" id="day-cell-posts">16<div id="cal-post-tags"></div></div>
-        <div class="day-square">17</div><div class="day-square">18</div><div class="day-square">19</div>
-        <div class="day-square">20</div><div class="day-square">21</div><div class="day-square">22</div>
-        <div class="day-square">23</div><div class="day-square">24</div><div class="day-square">25</div>
-        <div class="day-square">26</div><div class="day-square">27</div><div class="day-square">28</div>
-        <div class="day-square">29</div><div class="day-square">30</div><div class="day-square">31</div>
+        <!-- I giorni da 1 a 31 vengono generati dinamicamente via JS -->
       </div>
     </div>
 
@@ -573,6 +568,7 @@
 
     window.onload = function() {
       checkAuth();
+      buildCalendarGrid();
       renderCalendarTags();
       updateDashboardCounts();
     };
@@ -699,16 +695,50 @@
       showSection('calendario');
     }
 
-    function renderCalendarTags() {
-      const container = document.getElementById('cal-post-tags');
-      if (!container) return;
-      container.innerHTML = '';
+    function buildCalendarGrid() {
+      const grid = document.getElementById('calendar-grid');
+      // Mantiene i nomi dei giorni
+      grid.innerHTML = `
+        <div class="day-name">L</div><div class="day-name">M</div><div class="day-name">M</div>
+        <div class="day-name">G</div><div class="day-name">V</div><div class="day-name">S</div><div class="day-name">D</div>
+      `;
+      // Genera i 31 caselli del mese
+      for (let day = 1; day <= 31; day++) {
+        const square = document.createElement('div');
+        square.className = 'day-square';
+        square.id = 'day-square-' + day;
+        square.innerHTML = `<div class="day-number">${day}</div><div class="post-tags-container"></div>`;
+        grid.appendChild(square);
+      }
+    }
 
+    function renderCalendarTags() {
+      // Pulisce tutti i contenitori di post
+      for (let day = 1; day <= 31; day++) {
+        const square = document.getElementById('day-square-' + day);
+        if (square) {
+          const container = square.querySelector('.post-tags-container');
+          if (container) container.innerHTML = '';
+        }
+      }
+
+      // Inserisce ciascun post nel casello del rispettivo giorno
       scheduledPosts.forEach(post => {
-        const tag = document.createElement('div');
-        tag.className = 'post-tag';
-        tag.innerText = `${post.platform}: ${post.text.substring(0, 8)}...`;
-        container.appendChild(tag);
+        if (post.date) {
+          const postDateObj = new Date(post.date);
+          const dayNum = postDateObj.getDate();
+          
+          const targetSquare = document.getElementById('day-square-' + dayNum);
+          if (targetSquare) {
+            const container = targetSquare.querySelector('.post-tags-container');
+            if (container) {
+              const tag = document.createElement('div');
+              tag.className = 'post-tag';
+              tag.innerText = `${post.platform}: ${post.text}`;
+              container.appendChild(tag);
+            }
+          }
+        }
       });
     }
 
