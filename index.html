@@ -126,7 +126,7 @@
 
     .btn-delete-item { background: #ff4d4f; color: #ffffff !important; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; }
 
-    /* VISUAL DI CALENDARIO SOCIAL (STILE TABELLA FOTO) */
+    /* VISUAL DI CALENDARIO SOCIAL */
     .cal-banner {
       background: linear-gradient(135deg, #0f766e, #0d9488);
       color: white; padding: 25px 20px; border-radius: 16px 16px 0 0; text-align: center;
@@ -161,7 +161,6 @@
     }
     .cal-table tr:nth-child(even) { background: #f0fdfa; }
 
-    /* Badge Social Tabella */
     .cal-social-icon {
       display: inline-flex; align-items: center; justify-content: center;
       width: 32px; height: 32px; border-radius: 6px; font-weight: bold; color: white; font-size: 14px;
@@ -170,7 +169,6 @@
     .cal-social-icon.instagram { background: #e1306c; }
     .cal-social-icon.linkedin { background: #0077b5; }
 
-    /* Interattività Flag Stato */
     .cal-checkbox {
       width: 22px; height: 22px; cursor: pointer; accent-color: #0d9488;
     }
@@ -212,6 +210,11 @@
         <a onclick="showSection('magazzino')" id="nav-magazzino">📦 Magazzino & Finanze</a>
         <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
       </div>
+      
+      <!-- PULSANTE DOWNLOAD EXCEL INTEGRATO -->
+      <button class="btn-primary" style="background:#10b981; margin-top: 15px;" onclick="exportToExcel()">
+        📥 Scarica Dati (Excel)
+      </button>
     </div>
   </div>
 
@@ -224,7 +227,7 @@
     <a onclick="showSection('magazzino')" id="mnav-magazzino"><span>📦</span>Stock</a>
   </div>
 
-  <!-- Contenuto -->
+  <!-- Contenuto Principale -->
   <div class="main">
 
     <!-- Dashboard -->
@@ -320,7 +323,7 @@
       </div>
     </div>
 
-    <!-- Sezione Newsletter -->
+    <!-- Newsletter -->
     <div id="sec-newsletter" class="section">
       <div class="top">
         <h1>Pianifica Newsletter</h1>
@@ -358,7 +361,7 @@
       </div>
     </div>
 
-    <!-- Sezione Prezzi & Vendite Libri -->
+    <!-- Prezzi & Vendite Libri -->
     <div id="sec-libri" class="section">
       <div class="top">
         <h1>🏷️ Prezzi & Vendite Libri</h1>
@@ -431,7 +434,7 @@
       </div>
     </div>
 
-    <!-- Sezione Magazzino & Finanze -->
+    <!-- Magazzino & Finanze -->
     <div id="sec-magazzino" class="section">
       <div class="top">
         <h1>Gestione Magazzino & Contabilità</h1>
@@ -486,14 +489,13 @@
       </div>
     </div>
 
-    <!-- Calendario / Tabella Agenda Social -->
+    <!-- Agenda Social -->
     <div id="sec-calendario" class="section">
       <div class="top">
         <h1>Agenda Post Social</h1>
         <p>Il piano editoriale mensile per la programmazione.</p>
       </div>
 
-      <!-- Banner Estetico -->
       <div class="cal-banner">
         <span class="cal-decor-left">🌸</span>
         <div class="cal-logo">LOGO</div>
@@ -502,7 +504,6 @@
         <span class="cal-decor-right">🌿</span>
       </div>
 
-      <!-- Tabella Scrollabile -->
       <div class="table-container">
         <table class="cal-table">
           <thead>
@@ -515,9 +516,7 @@
               <th style="width: 15%">Inviato / Flag</th>
             </tr>
           </thead>
-          <tbody id="cal-posts-body">
-            <!-- Popolato via JS -->
-          </tbody>
+          <tbody id="cal-posts-body"></tbody>
         </table>
       </div>
     </div>
@@ -699,7 +698,6 @@
       alert('Newsletter programmata con successo!');
     }
 
-    /* FUNZIONI PREZZI & VENDITE LIBRI */
     function toggleBookSaleFields() {
       const saleType = document.getElementById('bk-sale-type').value;
       const personFields = document.getElementById('bk-person-fields');
@@ -750,16 +748,8 @@
       const saleDate = document.getElementById('bk-sale-date').value;
       const clientName = document.getElementById('bk-client-name').value;
 
-      if (!customTitle) {
-        alert('Inserisci il titolo del libro!');
-        return;
-      }
-
-      if (isNaN(salePrice)) {
-        alert('Inserisci il prezzo di vendita!');
-        return;
-      }
-
+      if (!customTitle) { alert('Inserisci il titolo del libro!'); return; }
+      if (isNaN(salePrice)) { alert('Inserisci il prezzo di vendita!'); return; }
       if (saleType === 'Persona' && (!saleDate || !clientName)) {
         alert('Inserisci data e nome cliente per la vendita di persona!');
         return;
@@ -853,7 +843,6 @@
       updateDashboardCounts();
     }
 
-    /* FUNZIONI MAGAZZINO */
     function addStockItem() {
       const name = document.getElementById('st-name').value;
       const qty = parseInt(document.getElementById('st-qty').value);
@@ -907,7 +896,6 @@
       updateDashboardCounts();
     }
 
-    /* FUNZIONI CONTABILITÀ SPESE / GUADAGNI */
     function addFinanceTransaction() {
       const type = document.getElementById('fin-type').value;
       const desc = document.getElementById('fin-desc').value;
@@ -962,12 +950,10 @@
       updateDashboardCounts();
     }
 
-    /* RENDERING CALENDARIO SOCIAL */
     function renderPostsList() {
       const tbody = document.getElementById('cal-posts-body');
       tbody.innerHTML = '';
 
-      // Mostra MESE / ANNO in testata
       let labelMonthYear = "MESE / ANNO";
       if (scheduledPosts.length > 0 && scheduledPosts[0].date) {
         const d = new Date(scheduledPosts[0].date);
@@ -986,7 +972,6 @@
       scheduledPosts.forEach(post => {
         const tr = document.createElement('tr');
 
-        // Formattazione Giorno / Ora tollerante
         let dayTimeStr = 'Da programmare';
         if (post.date) {
           const d = new Date(post.date);
@@ -999,17 +984,14 @@
           }
         }
 
-        // Icona Social Brand
         let socialBadge = '';
         if (post.platform === 'Facebook') socialBadge = '<span class="cal-social-icon facebook">f</span>';
         else if (post.platform === 'Instagram') socialBadge = '<span class="cal-social-icon instagram">📷</span>';
         else if (post.platform === 'LinkedIn') socialBadge = '<span class="cal-social-icon linkedin">in</span>';
         else socialBadge = `<span class="post-card-badge">${post.platform}</span>`;
 
-        // Link
         let linkContent = (post.link === '-' || !post.link) ? '-' : `<a href="https://${post.link.replace(/^(https?:\/\/)?/, '')}" target="_blank" style="color: #0d9488; font-weight: 500; text-decoration: underline;">Apri link</a>`;
 
-        // Checkbox + Timestamp
         const isChecked = post.sent ? 'checked' : '';
         const timestampHtml = post.sentDate ? `<span class="date-badge">⏱️ ${post.sentDate}</span>` : '';
 
@@ -1031,7 +1013,6 @@
       });
     }
 
-    // Toggle Stato & Registrazione Data Ora
     function togglePostSent(id, checkbox) {
       const post = scheduledPosts.find(p => p.id === id);
       if (post) {
@@ -1117,6 +1098,66 @@
       const profitElem = document.getElementById('count-profit-net');
       profitElem.innerText = '€' + net.toFixed(2);
       profitElem.style.color = net >= 0 ? '#10b981' : '#ef4444';
+    }
+
+    /* ESPORTAZIONE DATI IN EXCEL / CSV */
+    function exportToExcel() {
+      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+
+      // 1. POST SOCIAL
+      csvContent += "=== AGENDA POST SOCIAL ===\n";
+      csvContent += "Giorno/Ora;Canale Social;Argomento;Testo Post;Link;Inviato\n";
+      scheduledPosts.forEach(p => {
+        let sentStr = p.sent ? `Sì (${p.sentDate})` : "No";
+        let textClean = `"${(p.text || '').replace(/"/g, '""')}"`;
+        csvContent += `"${p.date}";"${p.platform}";"${p.topic}";${textClean};"${p.link}";"${sentStr}"\n`;
+      });
+
+      csvContent += "\n";
+
+      // 2. NEWSLETTER
+      csvContent += "=== NEWSLETTER ===\n";
+      csvContent += "Data Invio;Oggetto;Testo Body\n";
+      scheduledNewsletters.forEach(n => {
+        let bodyClean = `"${(n.body || '').replace(/"/g, '""')}"`;
+        csvContent += `"${n.date}";"${n.subject}";${bodyClean}\n`;
+      });
+
+      csvContent += "\n";
+
+      // 3. REGISTRO LIBRI & VENDITE
+      csvContent += "=== REGISTRO LIBRI & VENDITE ===\n";
+      csvContent += "Titolo Libro;Data Acquisto;Quantità;Prezzo Acquisto;Tipo Vendita;Prezzo Vendita;Data Vendita;Cliente\n";
+      bookRecords.forEach(b => {
+        csvContent += `"${b.title}";"${b.buyDate}";${b.qty};"${b.buyPrice}";"${b.saleType}";"${b.salePrice || ''}";"${b.saleDate || ''}";"${b.clientName || ''}"\n`;
+      });
+
+      csvContent += "\n";
+
+      // 4. MAGAZZINO
+      csvContent += "=== MAGAZZINO (STOCK) ===\n";
+      csvContent += "Prodotto;Quantità;Prezzo Unitario;Valore Totale\n";
+      stockItems.forEach(s => {
+        let total = (s.qty * s.price).toFixed(2);
+        csvContent += `"${s.name}";${s.qty};"${s.price}";"${total}"\n`;
+      });
+
+      csvContent += "\n";
+
+      // 5. CONTABILITÀ / SPESE E GUADAGNI
+      csvContent += "=== SPESE E GUADAGNI ===\n";
+      csvContent += "Data;Tipo Operazione;Descrizione;Importo\n";
+      financeItems.forEach(f => {
+        csvContent += `"${f.date}";"${f.type}";"${f.desc}";"${f.amount}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "Planner_Pro_Dati_Completi.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   </script>
 
