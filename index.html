@@ -126,6 +126,58 @@
 
     .btn-delete-item { background: #ff4d4f; color: #ffffff !important; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; }
 
+    /* VISUAL DI CALENDARIO SOCIAL (STILE TABELLA FOTO) */
+    .cal-banner {
+      background: linear-gradient(135deg, #0f766e, #0d9488);
+      color: white; padding: 25px 20px; border-radius: 16px 16px 0 0; text-align: center;
+      position: relative; overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .cal-decor-left, .cal-decor-right {
+      position: absolute; top: 10px; font-size: 26px;
+    }
+    .cal-decor-left { left: 20px; }
+    .cal-decor-right { right: 20px; }
+    .cal-logo {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; margin-bottom: 4px;
+    }
+    .cal-title-main { font-family: 'Georgia', serif; font-size: 22px; font-weight: bold; margin: 4px 0; }
+    .cal-title-sub { font-family: 'Georgia', serif; font-size: 32px; letter-spacing: 3px; font-weight: bold; text-transform: uppercase; }
+
+    .table-container {
+      background: #ffffff; border-radius: 0 0 16px 16px; overflow-x: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; border-top: none;
+    }
+    .cal-table {
+      width: 100%; border-collapse: collapse; min-width: 900px;
+    }
+    .cal-table th {
+      background: #115e59; color: #ffffff; text-align: center; font-weight: 600;
+      font-size: 14px; padding: 14px 10px; border: 1px solid #0d9488;
+    }
+    .cal-table td {
+      padding: 14px 10px; border: 1px solid #2dd4bf; text-align: center; font-size: 13px; color: #1e293b;
+      vertical-align: middle; word-break: break-word;
+    }
+    .cal-table tr:nth-child(even) { background: #f0fdfa; }
+
+    /* Badge Social Tabella */
+    .cal-social-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 6px; font-weight: bold; color: white; font-size: 14px;
+    }
+    .cal-social-icon.facebook { background: #1877f2; }
+    .cal-social-icon.instagram { background: #e1306c; }
+    .cal-social-icon.linkedin { background: #0077b5; }
+
+    /* Interattività Flag Stato */
+    .cal-checkbox {
+      width: 22px; height: 22px; cursor: pointer; accent-color: #0d9488;
+    }
+    .date-badge {
+      display: block; font-size: 11px; color: #0d9488; font-weight: bold; margin-top: 4px;
+    }
+
     @media (max-width: 768px) {
       .sidebar { display: none; }
       .mobile-nav { display: flex; }
@@ -217,24 +269,34 @@
             </select>
           </div>
 
+          <div class="form-group">
+            <label>Data e Ora di Pubblicazione</label>
+            <input type="datetime-local" id="post-date">
+          </div>
+
+          <div class="form-group">
+            <label>Argomento (Topic)</label>
+            <input type="text" id="post-topic" placeholder="Es. Nuovi arrivi in libreria o Promo fine mese">
+          </div>
+
           <div class="btn-tools">
             <button class="btn-ai" onclick="generateAiText()">✨ Testo AI</button>
             <a class="btn-canva" href="https://www.canva.com" target="_blank">🎨 Canva</a>
           </div>
 
           <div class="form-group">
-            <label>Testo</label>
+            <label>Post (Testo / Copy)</label>
             <textarea id="post-text" placeholder="Scrivi il testo del post..." oninput="updatePreview()"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Link / URL</label>
+            <input type="text" id="post-link" placeholder="Es. www.amazon.it/libro o articolo di blog">
           </div>
 
           <div class="form-group">
             <label>Foto o Video</label>
             <input type="file" id="post-file" accept="image/*,video/*" onchange="previewMedia(event)">
-          </div>
-
-          <div class="form-group">
-            <label>Data e Ora</label>
-            <input type="datetime-local" id="post-date">
           </div>
 
           <button class="btn-primary" onclick="schedulePost()">Salva e Programma Post</button>
@@ -305,7 +367,6 @@
 
       <div class="editor-container">
         <div class="form-box">
-          <!-- PARTE 1: Acquisto / Stampa -->
           <div class="form-section-title">1. Dati Libro & Acquisto</div>
           <div class="form-group">
             <label>Titolo del Libro</label>
@@ -329,7 +390,6 @@
 
           <button class="btn-primary" style="background:#6c63ff; margin-bottom: 25px;" onclick="addBookBuyRecord()">Salva Dati Libro di Acquisto</button>
 
-          <!-- PARTE 2: Canale di Vendita -->
           <div class="form-section-title">2. Canale di Vendita</div>
           
           <div class="form-group">
@@ -379,7 +439,6 @@
       </div>
 
       <div class="editor-container">
-        <!-- Form Magazzino -->
         <div class="form-box">
           <h3 style="margin-top:0; font-size:16px; color:#d97706;">📦 Aggiungi Prodotto in Stock</h3>
           <div class="form-group">
@@ -417,7 +476,6 @@
           <button class="btn-primary" style="background:#10b981;" onclick="addFinanceTransaction()">Registra Operazione</button>
         </div>
 
-        <!-- Liste Risultati -->
         <div>
           <h3 style="margin-top:0; font-size:16px;">Prodotti in Magazzino</h3>
           <div class="posts-list" id="stock-container-list" style="margin-bottom:25px;"></div>
@@ -428,12 +486,40 @@
       </div>
     </div>
 
-    <!-- Agenda Social -->
+    <!-- Calendario / Tabella Agenda Social -->
     <div id="sec-calendario" class="section">
       <div class="top">
         <h1>Agenda Post Social</h1>
+        <p>Il piano editoriale mensile per la programmazione.</p>
       </div>
-      <div class="posts-list" id="posts-container-list"></div>
+
+      <!-- Banner Estetico -->
+      <div class="cal-banner">
+        <span class="cal-decor-left">🌸</span>
+        <div class="cal-logo">LOGO</div>
+        <div class="cal-title-main">Calendario social</div>
+        <div class="cal-title-sub" id="cal-month-year">MESE / ANNO</div>
+        <span class="cal-decor-right">🌿</span>
+      </div>
+
+      <!-- Tabella Scrollabile -->
+      <div class="table-container">
+        <table class="cal-table">
+          <thead>
+            <tr>
+              <th style="width: 15%">Giorno / Ora</th>
+              <th style="width: 8%">Social</th>
+              <th style="width: 20%">Argomento</th>
+              <th style="width: 27%">Post</th>
+              <th style="width: 15%">Link</th>
+              <th style="width: 15%">Inviato / Flag</th>
+            </tr>
+          </thead>
+          <tbody id="cal-posts-body">
+            <!-- Popolato via JS -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Statistiche -->
@@ -551,20 +637,34 @@
 
     function schedulePost() {
       const platform = document.getElementById('channel-select').value;
-      const text = document.getElementById('post-text').value;
       const date = document.getElementById('post-date').value;
+      const topic = document.getElementById('post-topic').value || '-';
+      const text = document.getElementById('post-text').value;
+      const link = document.getElementById('post-link').value || '-';
 
       if (!text || !date) { alert('Inserisci un testo e seleziona una data!'); return; }
 
-      const newPost = { id: Date.now(), platform, text, date };
+      const newPost = {
+        id: Date.now(),
+        platform,
+        date,
+        topic,
+        text,
+        link,
+        sent: false,
+        sentDate: ''
+      };
+
       scheduledPosts.push(newPost);
       localStorage.setItem('sp_posts', JSON.stringify(scheduledPosts));
 
       renderPostsList();
       updateDashboardCounts();
 
-      document.getElementById('post-text').value = '';
       document.getElementById('post-date').value = '';
+      document.getElementById('post-topic').value = '';
+      document.getElementById('post-text').value = '';
+      document.getElementById('post-link').value = '';
       document.getElementById('post-file').value = '';
       document.getElementById('img-preview').style.display = 'none';
       document.getElementById('video-preview').style.display = 'none';
@@ -662,7 +762,6 @@
         return;
       }
 
-      // Cerca se esiste già un acquisto con lo stesso titolo per abbinarlo
       let book = bookRecords.find(b => b.title.toLowerCase() === customTitle.toLowerCase() && b.salePrice === null);
 
       if (book) {
@@ -860,28 +959,88 @@
       updateDashboardCounts();
     }
 
+    /* RENDERING CALENDARIO SOCIAL (STILE TABELLA FOTO) */
     function renderPostsList() {
-      const container = document.getElementById('posts-container-list');
-      container.innerHTML = '';
+      const tbody = document.getElementById('cal-posts-body');
+      tbody.innerHTML = '';
+
+      // Mostra MESE / ANNO in testata calcolato in base al primo post, oppure mese corrente
+      let labelMonthYear = "SETTEMBRE / 2026";
+      if (scheduledPosts.length > 0) {
+        const firstPostDate = new Date(scheduledPosts[0].date);
+        if (!isNaN(firstPostDate)) {
+          const opt = { month: 'long', year: 'numeric' };
+          labelMonthYear = firstPostDate.toLocaleDateString('it-IT', opt).toUpperCase();
+        }
+      }
+      document.getElementById('cal-month-year').innerText = labelMonthYear;
 
       if (scheduledPosts.length === 0) {
-        container.innerHTML = '<p style="color:#888; text-align:center;">Nessun post programmato.</p>';
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888; padding: 20px;">Nessun post pianificato in calendario.</td></tr>`;
         return;
       }
 
       scheduledPosts.forEach(post => {
-        const item = document.createElement('div');
-        item.className = 'post-card-item';
-        item.innerHTML = `
-          <div class="post-card-info">
-            <span class="post-card-badge">${post.platform}</span>
-            <div style="margin-top:6px; font-weight:600;">${post.text}</div>
-            <small style="color:#777;">Data: ${post.date.replace('T', ' ')}</small>
-          </div>
-          <button class="btn-delete-item" onclick="deletePost(${post.id})">Elimina</button>
+        const tr = document.createElement('tr');
+
+        // Giorno / Ora
+        let dayTimeStr = 'Data non valida';
+        if (post.date) {
+          const d = new Date(post.date);
+          if (!isNaN(d)) {
+            const dayName = d.toLocaleDateString('it-IT', { day: '2-digit', month: 'long' });
+            const hourName = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+            dayTimeStr = `<strong>${dayName}</strong><br><span style="color:#64748b; font-size:11px;">${hourName}</span>`;
+          }
+        }
+
+        // Icona Social Brand
+        let socialBadge = '';
+        if (post.platform === 'Facebook') socialBadge = '<span class="cal-social-icon facebook">f</span>';
+        else if (post.platform === 'Instagram') socialBadge = '<span class="cal-social-icon instagram">📷</span>';
+        else if (post.platform === 'LinkedIn') socialBadge = '<span class="cal-social-icon linkedin">in</span>';
+        else socialBadge = `<span class="post-card-badge">${post.platform}</span>`;
+
+        // Link
+        let linkContent = post.link === '-' ? '-' : `<a href="https://${post.link.replace(/^(https?:\/\/)?/, '')}" target="_blank" style="color: #0d9488; font-weight: 500; text-decoration: underline;">Apri link</a>`;
+
+        // Checkbox + Timestamp
+        const isChecked = post.sent ? 'checked' : '';
+        const timestampHtml = post.sentDate ? `<span class="date-badge">⏱️ ${post.sentDate}</span>` : '';
+
+        tr.innerHTML = `
+          <td>${dayTimeStr}</td>
+          <td>${socialBadge}</td>
+          <td style="text-align:left; font-weight: 500;">${post.topic || '-'}</td>
+          <td style="text-align:left; font-style: italic; max-width: 300px;">${post.text}</td>
+          <td>${linkContent}</td>
+          <td>
+            <div style="display: inline-flex; flex-direction: column; align-items: center;">
+              <input type="checkbox" class="cal-checkbox" ${isChecked} onchange="togglePostSent(${post.id}, this)">
+              ${timestampHtml}
+            </div>
+            <button class="btn-delete-item" style="margin-top:10px; font-size:9px; padding:3px 6px;" onclick="deletePost(${post.id})">Elimina</button>
+          </td>
         `;
-        container.appendChild(item);
+        tbody.appendChild(tr);
       });
+    }
+
+    // Toggle Stato & Registrazione Data Ora
+    function togglePostSent(id, checkbox) {
+      const post = scheduledPosts.find(p => p.id === id);
+      if (post) {
+        post.sent = checkbox.checked;
+        if (checkbox.checked) {
+          const now = new Date();
+          const timestamp = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+          post.sentDate = timestamp;
+        } else {
+          post.sentDate = '';
+        }
+        localStorage.setItem('sp_posts', JSON.stringify(scheduledPosts));
+        renderPostsList();
+      }
     }
 
     function renderNewslettersList() {
