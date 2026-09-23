@@ -305,7 +305,7 @@
 
       <div class="editor-container">
         <div class="form-box">
-          <!-- PARTE 1: Acquisto / Stampa con Quantità -->
+          <!-- PARTE 1: Acquisto / Stampa -->
           <div class="form-section-title">1. Dati Libro & Acquisto</div>
           <div class="form-group">
             <label>Titolo del Libro</label>
@@ -331,9 +331,10 @@
 
           <!-- PARTE 2: Canale di Vendita -->
           <div class="form-section-title">2. Canale di Vendita</div>
+          
           <div class="form-group">
-            <label>Seleziona Libro Registrato</label>
-            <select id="bk-select-existing"></select>
+            <label>Titolo del Libro Venduto</label>
+            <input type="text" id="bk-custom-title" placeholder="Es. I colori di casa delle filastrocche">
           </div>
 
           <div class="form-group">
@@ -466,7 +467,6 @@
       renderStockList();
       renderFinanceList();
       renderBooksList();
-      updateBookDropdown();
       updateDashboardCounts();
     };
 
@@ -630,7 +630,6 @@
       localStorage.setItem('sp_books', JSON.stringify(bookRecords));
 
       renderBooksList();
-      updateBookDropdown();
       updateDashboardCounts();
 
       document.getElementById('bk-title').value = '';
@@ -642,14 +641,19 @@
     }
 
     function addBookSaleRecord() {
-      const bookId = parseInt(document.getElementById('bk-select-existing').value);
+      const customTitle = document.getElementById('bk-custom-title').value;
       const saleType = document.getElementById('bk-sale-type').value;
       const salePrice = parseFloat(document.getElementById('bk-sale-price').value);
       const saleDate = document.getElementById('bk-sale-date').value;
       const clientName = document.getElementById('bk-client-name').value;
 
-      if (!bookId || isNaN(salePrice)) {
-        alert('Seleziona un libro e inserisci il prezzo di vendita!');
+      if (!customTitle) {
+        alert('Inserisci il titolo del libro!');
+        return;
+      }
+
+      if (isNaN(salePrice)) {
+        alert('Inserisci il prezzo di vendita!');
         return;
       }
 
@@ -658,34 +662,39 @@
         return;
       }
 
-      const book = bookRecords.find(b => b.id === bookId);
+      // Cerca se esiste già un acquisto con lo stesso titolo per abbinarlo
+      let book = bookRecords.find(b => b.title.toLowerCase() === customTitle.toLowerCase() && b.salePrice === null);
+
       if (book) {
         book.saleType = saleType;
         book.salePrice = salePrice;
         book.saleDate = saleDate;
         book.clientName = clientName;
-
-        localStorage.setItem('sp_books', JSON.stringify(bookRecords));
-        renderBooksList();
-        updateDashboardCounts();
-
-        document.getElementById('bk-sale-price').value = '';
-        document.getElementById('bk-sale-date').value = '';
-        document.getElementById('bk-client-name').value = '';
-
-        alert('Vendita registrata con successo!');
+      } else {
+        book = {
+          id: Date.now(),
+          title: customTitle,
+          buyDate: new Date().toISOString().split('T')[0],
+          qty: 1,
+          buyPrice: 0,
+          saleType,
+          salePrice,
+          saleDate,
+          clientName
+        };
+        bookRecords.push(book);
       }
-    }
 
-    function updateBookDropdown() {
-      const select = document.getElementById('bk-select-existing');
-      select.innerHTML = '<option value="">-- Seleziona un libro --</option>';
-      bookRecords.forEach(b => {
-        const opt = document.createElement('option');
-        opt.value = b.id;
-        opt.innerText = `${b.title} (${b.qty} pz del ${b.buyDate})`;
-        select.appendChild(opt);
-      });
+      localStorage.setItem('sp_books', JSON.stringify(bookRecords));
+      renderBooksList();
+      updateDashboardCounts();
+
+      document.getElementById('bk-custom-title').value = '';
+      document.getElementById('bk-sale-price').value = '';
+      document.getElementById('bk-sale-date').value = '';
+      document.getElementById('bk-client-name').value = '';
+
+      alert('Vendita registrata con successo!');
     }
 
     function renderBooksList() {
@@ -739,7 +748,6 @@
       bookRecords = bookRecords.filter(b => b.id !== id);
       localStorage.setItem('sp_books', JSON.stringify(bookRecords));
       renderBooksList();
-      updateBookDropdown();
       updateDashboardCounts();
     }
 
