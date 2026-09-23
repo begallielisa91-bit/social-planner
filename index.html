@@ -67,6 +67,11 @@
     .card h3 { margin: 0 0 8px; font-size: 12px; color: #888899; text-transform: uppercase; }
     .card .value { font-size: 22px; font-weight: bold; }
 
+    .home-export-card {
+      background: white; padding: 20px; border-radius: 12px; margin-top: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: space-between; gap: 15px;
+    }
+
     .editor-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
     .form-box, .preview-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
     .form-group { margin-bottom: 15px; }
@@ -181,6 +186,7 @@
       .mobile-nav { display: flex; }
       .main { margin-left: 0; padding: 20px 15px; }
       .editor-container { grid-template-columns: 1fr; }
+      .home-export-card { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -211,9 +217,8 @@
         <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
       </div>
       
-      <!-- PULSANTE DOWNLOAD EXCEL INTEGRATO -->
       <button class="btn-primary" style="background:#10b981; margin-top: 15px;" onclick="exportToExcel()">
-        📥 Scarica Dati (Excel)
+        📥 Scarica Excel (.xls)
       </button>
     </div>
   </div>
@@ -230,12 +235,13 @@
   <!-- Contenuto Principale -->
   <div class="main">
 
-    <!-- Dashboard -->
+    <!-- Dashboard (HOME) -->
     <div id="sec-dashboard" class="section active">
       <div class="top">
         <h1>Dashboard</h1>
         <p>Panoramica dei tuoi contenuti e attività.</p>
       </div>
+
       <div class="grid">
         <div class="card">
           <h3>Post Programmati</h3>
@@ -253,6 +259,17 @@
           <h3>Profitto Netto</h3>
           <div class="value" id="count-profit-net" style="color:#10b981;">€0.00</div>
         </div>
+      </div>
+
+      <!-- BOX DOWNLOAD EXCEL IN HOME PAGE -->
+      <div class="home-export-card">
+        <div>
+          <h3 style="margin: 0 0 6px 0; font-size: 16px; color: #1e293b;">📊 Esportazione Dati Completa</h3>
+          <p style="margin: 0; color: #64748b; font-size: 13px;">Scarica un report Excel in formato <strong>.xls</strong> contenente tutti i dati salvati (Social, Newsletter, Libri, Stock e Finanze).</p>
+        </div>
+        <button class="btn-primary" style="background:#10b981; width: auto; padding: 12px 24px; white-space: nowrap;" onclick="exportToExcel()">
+          📥 Scarica Dati Excel (.xls)
+        </button>
       </div>
     </div>
 
@@ -1100,64 +1117,74 @@
       profitElem.style.color = net >= 0 ? '#10b981' : '#ef4444';
     }
 
-    /* ESPORTAZIONE DATI IN EXCEL / CSV */
+    /* ESPORTAZIONE DATI IN FORMATO .XLS COMPATIBILE EXCEL */
     function exportToExcel() {
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+      let excelContent = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
+          <style>
+            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+            th { background-color: #6c63ff; color: white; border: 1px solid #ccc; padding: 8px; text-align: left; }
+            td { border: 1px solid #ccc; padding: 8px; }
+            .section-header { font-size: 16px; font-weight: bold; background-color: #eeeaff; color: #6c63ff; padding: 10px; }
+          </style>
+        </head>
+        <body>
+      `;
 
       // 1. POST SOCIAL
-      csvContent += "=== AGENDA POST SOCIAL ===\n";
-      csvContent += "Giorno/Ora;Canale Social;Argomento;Testo Post;Link;Inviato\n";
+      excelContent += `<div class="section-header">1. AGENDA POST SOCIAL</div>`;
+      excelContent += `<table><tr><th>Giorno/Ora</th><th>Canale Social</th><th>Argomento</th><th>Testo Post</th><th>Link</th><th>Inviato</th></tr>`;
       scheduledPosts.forEach(p => {
         let sentStr = p.sent ? `Sì (${p.sentDate})` : "No";
-        let textClean = `"${(p.text || '').replace(/"/g, '""')}"`;
-        csvContent += `"${p.date}";"${p.platform}";"${p.topic}";${textClean};"${p.link}";"${sentStr}"\n`;
+        excelContent += `<tr><td>${p.date || ''}</td><td>${p.platform || ''}</td><td>${p.topic || ''}</td><td>${p.text || ''}</td><td>${p.link || ''}</td><td>${sentStr}</td></tr>`;
       });
-
-      csvContent += "\n";
+      excelContent += `</table><br/>`;
 
       // 2. NEWSLETTER
-      csvContent += "=== NEWSLETTER ===\n";
-      csvContent += "Data Invio;Oggetto;Testo Body\n";
+      excelContent += `<div class="section-header">2. NEWSLETTER</div>`;
+      excelContent += `<table><tr><th>Data Invio</th><th>Oggetto</th><th>Testo Body</th></tr>`;
       scheduledNewsletters.forEach(n => {
-        let bodyClean = `"${(n.body || '').replace(/"/g, '""')}"`;
-        csvContent += `"${n.date}";"${n.subject}";${bodyClean}\n`;
+        excelContent += `<tr><td>${n.date || ''}</td><td>${n.subject || ''}</td><td>${n.body || ''}</td></tr>`;
       });
-
-      csvContent += "\n";
+      excelContent += `</table><br/>`;
 
       // 3. REGISTRO LIBRI & VENDITE
-      csvContent += "=== REGISTRO LIBRI & VENDITE ===\n";
-      csvContent += "Titolo Libro;Data Acquisto;Quantità;Prezzo Acquisto;Tipo Vendita;Prezzo Vendita;Data Vendita;Cliente\n";
+      excelContent += `<div class="section-header">3. REGISTRO LIBRI & VENDITE</div>`;
+      excelContent += `<table><tr><th>Titolo Libro</th><th>Data Acquisto</th><th>Quantità</th><th>Prezzo Acquisto</th><th>Tipo Vendita</th><th>Prezzo Vendita</th><th>Data Vendita</th><th>Cliente</th></tr>`;
       bookRecords.forEach(b => {
-        csvContent += `"${b.title}";"${b.buyDate}";${b.qty};"${b.buyPrice}";"${b.saleType}";"${b.salePrice || ''}";"${b.saleDate || ''}";"${b.clientName || ''}"\n`;
+        excelContent += `<tr><td>${b.title || ''}</td><td>${b.buyDate || ''}</td><td>${b.qty || 0}</td><td>€${b.buyPrice || 0}</td><td>${b.saleType || ''}</td><td>${b.salePrice ? '€' + b.salePrice : ''}</td><td>${b.saleDate || ''}</td><td>${b.clientName || ''}</td></tr>`;
       });
-
-      csvContent += "\n";
+      excelContent += `</table><br/>`;
 
       // 4. MAGAZZINO
-      csvContent += "=== MAGAZZINO (STOCK) ===\n";
-      csvContent += "Prodotto;Quantità;Prezzo Unitario;Valore Totale\n";
+      excelContent += `<div class="section-header">4. MAGAZZINO (STOCK)</div>`;
+      excelContent += `<table><tr><th>Prodotto</th><th>Quantità</th><th>Prezzo Unitario</th><th>Valore Totale</th></tr>`;
       stockItems.forEach(s => {
         let total = (s.qty * s.price).toFixed(2);
-        csvContent += `"${s.name}";${s.qty};"${s.price}";"${total}"\n`;
+        excelContent += `<tr><td>${s.name || ''}</td><td>${s.qty || 0}</td><td>€${s.price || 0}</td><td>€${total}</td></tr>`;
       });
-
-      csvContent += "\n";
+      excelContent += `</table><br/>`;
 
       // 5. CONTABILITÀ / SPESE E GUADAGNI
-      csvContent += "=== SPESE E GUADAGNI ===\n";
-      csvContent += "Data;Tipo Operazione;Descrizione;Importo\n";
+      excelContent += `<div class="section-header">5. SPESE E GUADAGNI</div>`;
+      excelContent += `<table><tr><th>Data</th><th>Tipo Operazione</th><th>Descrizione</th><th>Importo</th></tr>`;
       financeItems.forEach(f => {
-        csvContent += `"${f.date}";"${f.type}";"${f.desc}";"${f.amount}"\n`;
+        excelContent += `<tr><td>${f.date || ''}</td><td>${f.type || ''}</td><td>${f.desc || ''}</td><td>€${f.amount || 0}</td></tr>`;
       });
+      excelContent += `</table></body></html>`;
 
-      const encodedUri = encodeURI(csvContent);
+      // Creazione File con Estensione .xls
+      const blob = new Blob(['\ufeff' + excelContent], { type: 'application/vnd.ms-excel' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "Planner_Pro_Dati_Completi.csv");
+      link.href = url;
+      link.download = "Planner_Pro_Dati_Completi.xls";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
   </script>
 
