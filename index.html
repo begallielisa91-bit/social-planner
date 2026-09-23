@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Social, Email & Business Planner Pro</title>
 
+  <!-- Libreria SheetJS per l'esportazione nativa in formato .xlsx -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
     * { box-sizing: border-box; }
     body {
@@ -46,7 +49,7 @@
     .mobile-nav {
       display: none; position: fixed; bottom: 0; left: 0; width: 100%;
       background: white; border-top: 1px solid #eee; padding: 10px 0;
-      z-index: 200; justify-content: space-around;
+      z-index: 200; justify-around;
     }
     .mobile-nav a {
       display: flex; flex-direction: column; align-items: center;
@@ -218,7 +221,7 @@
       </div>
       
       <button class="btn-primary" style="background:#10b981; margin-top: 15px;" onclick="exportToExcel()">
-        📥 Scarica Excel (.xls)
+        📥 Scarica Excel (.xlsx)
       </button>
     </div>
   </div>
@@ -265,10 +268,10 @@
       <div class="home-export-card">
         <div>
           <h3 style="margin: 0 0 6px 0; font-size: 16px; color: #1e293b;">📊 Esportazione Dati Completa</h3>
-          <p style="margin: 0; color: #64748b; font-size: 13px;">Scarica un report Excel in formato <strong>.xls</strong> contenente tutti i dati salvati (Social, Newsletter, Libri, Stock e Finanze).</p>
+          <p style="margin: 0; color: #64748b; font-size: 13px;">Scarica un report Excel in formato nativo <strong>.xlsx</strong> con fogli separati per Social, Newsletter, Libri, Stock e Finanze.</p>
         </div>
         <button class="btn-primary" style="background:#10b981; width: auto; padding: 12px 24px; white-space: nowrap;" onclick="exportToExcel()">
-          📥 Scarica Dati Excel (.xls)
+          📥 Scarica Dati Excel (.xlsx)
         </button>
       </div>
     </div>
@@ -1117,74 +1120,72 @@
       profitElem.style.color = net >= 0 ? '#10b981' : '#ef4444';
     }
 
-    /* ESPORTAZIONE DATI IN FORMATO .XLS COMPATIBILE EXCEL */
+    /* ESPORTAZIONE DATI IN FORMATO .XLSX NATIVO CON SHEETJS */
     function exportToExcel() {
-      let excelContent = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-        <head>
-          <meta http-equiv="content-type" content="text/plain; charset=UTF-8"/>
-          <style>
-            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
-            th { background-color: #6c63ff; color: white; border: 1px solid #ccc; padding: 8px; text-align: left; }
-            td { border: 1px solid #ccc; padding: 8px; }
-            .section-header { font-size: 16px; font-weight: bold; background-color: #eeeaff; color: #6c63ff; padding: 10px; }
-          </style>
-        </head>
-        <body>
-      `;
+      if (typeof XLSX === 'undefined') {
+        alert('Caricamento della libreria Excel in corso, riprova tra qualche istante.');
+        return;
+      }
 
-      // 1. POST SOCIAL
-      excelContent += `<div class="section-header">1. AGENDA POST SOCIAL</div>`;
-      excelContent += `<table><tr><th>Giorno/Ora</th><th>Canale Social</th><th>Argomento</th><th>Testo Post</th><th>Link</th><th>Inviato</th></tr>`;
-      scheduledPosts.forEach(p => {
-        let sentStr = p.sent ? `Sì (${p.sentDate})` : "No";
-        excelContent += `<tr><td>${p.date || ''}</td><td>${p.platform || ''}</td><td>${p.topic || ''}</td><td>${p.text || ''}</td><td>${p.link || ''}</td><td>${sentStr}</td></tr>`;
-      });
-      excelContent += `</table><br/>`;
+      const workbook = XLSX.utils.book_new();
 
-      // 2. NEWSLETTER
-      excelContent += `<div class="section-header">2. NEWSLETTER</div>`;
-      excelContent += `<table><tr><th>Data Invio</th><th>Oggetto</th><th>Testo Body</th></tr>`;
-      scheduledNewsletters.forEach(n => {
-        excelContent += `<tr><td>${n.date || ''}</td><td>${n.subject || ''}</td><td>${n.body || ''}</td></tr>`;
-      });
-      excelContent += `</table><br/>`;
+      // 1. Post Social
+      const socialData = scheduledPosts.map(p => ({
+        "Giorno/Ora": p.date ? p.date.replace('T', ' ') : '',
+        "Canale Social": p.platform || '',
+        "Argomento": p.topic || '',
+        "Testo Post": p.text || '',
+        "Link": p.link || '',
+        "Stato Invio": p.sent ? `Sì (${p.sentDate})` : 'No'
+      }));
+      const wsSocial = XLSX.utils.json_to_sheet(socialData.length ? socialData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsSocial, "Agenda Social");
 
-      // 3. REGISTRO LIBRI & VENDITE
-      excelContent += `<div class="section-header">3. REGISTRO LIBRI & VENDITE</div>`;
-      excelContent += `<table><tr><th>Titolo Libro</th><th>Data Acquisto</th><th>Quantità</th><th>Prezzo Acquisto</th><th>Tipo Vendita</th><th>Prezzo Vendita</th><th>Data Vendita</th><th>Cliente</th></tr>`;
-      bookRecords.forEach(b => {
-        excelContent += `<tr><td>${b.title || ''}</td><td>${b.buyDate || ''}</td><td>${b.qty || 0}</td><td>€${b.buyPrice || 0}</td><td>${b.saleType || ''}</td><td>${b.salePrice ? '€' + b.salePrice : ''}</td><td>${b.saleDate || ''}</td><td>${b.clientName || ''}</td></tr>`;
-      });
-      excelContent += `</table><br/>`;
+      // 2. Newsletter
+      const nlData = scheduledNewsletters.map(n => ({
+        "Data Invio": n.date ? n.date.replace('T', ' ') : '',
+        "Oggetto": n.subject || '',
+        "Testo Body": n.body || ''
+      }));
+      const wsNl = XLSX.utils.json_to_sheet(nlData.length ? nlData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsNl, "Newsletter");
 
-      // 4. MAGAZZINO
-      excelContent += `<div class="section-header">4. MAGAZZINO (STOCK)</div>`;
-      excelContent += `<table><tr><th>Prodotto</th><th>Quantità</th><th>Prezzo Unitario</th><th>Valore Totale</th></tr>`;
-      stockItems.forEach(s => {
-        let total = (s.qty * s.price).toFixed(2);
-        excelContent += `<tr><td>${s.name || ''}</td><td>${s.qty || 0}</td><td>€${s.price || 0}</td><td>€${total}</td></tr>`;
-      });
-      excelContent += `</table><br/>`;
+      // 3. Libri & Vendite
+      const bookData = bookRecords.map(b => ({
+        "Titolo Libro": b.title || '',
+        "Data Acquisto": b.buyDate || '',
+        "Quantità": b.qty || 0,
+        "Costo Acquisto Unitario (€)": b.buyPrice || 0,
+        "Tipo Vendita": b.saleType || '',
+        "Prezzo Vendita Unitario (€)": b.salePrice ?? '',
+        "Data Vendita": b.saleDate || '',
+        "Cliente": b.clientName || ''
+      }));
+      const wsBooks = XLSX.utils.json_to_sheet(bookData.length ? bookData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsBooks, "Libri & Vendite");
 
-      // 5. CONTABILITÀ / SPESE E GUADAGNI
-      excelContent += `<div class="section-header">5. SPESE E GUADAGNI</div>`;
-      excelContent += `<table><tr><th>Data</th><th>Tipo Operazione</th><th>Descrizione</th><th>Importo</th></tr>`;
-      financeItems.forEach(f => {
-        excelContent += `<tr><td>${f.date || ''}</td><td>${f.type || ''}</td><td>${f.desc || ''}</td><td>€${f.amount || 0}</td></tr>`;
-      });
-      excelContent += `</table></body></html>`;
+      // 4. Magazzino (Stock)
+      const stockData = stockItems.map(s => ({
+        "Prodotto": s.name || '',
+        "Quantità": s.qty || 0,
+        "Prezzo Unitario (€)": s.price || 0,
+        "Valore Totale (€)": (s.qty * s.price).toFixed(2)
+      }));
+      const wsStock = XLSX.utils.json_to_sheet(stockData.length ? stockData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsStock, "Magazzino Stock");
 
-      // Creazione File con Estensione .xls
-      const blob = new Blob(['\ufeff' + excelContent], { type: 'application/vnd.ms-excel' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "Planner_Pro_Dati_Completi.xls";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // 5. Spese e Guadagni
+      const financeData = financeItems.map(f => ({
+        "Data": f.date || '',
+        "Tipo Operazione": f.type || '',
+        "Descrizione": f.desc || '',
+        "Importo (€)": f.amount || 0
+      }));
+      const wsFinance = XLSX.utils.json_to_sheet(financeData.length ? financeData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsFinance, "Spese e Guadagni");
+
+      // Download del file .xlsx
+      XLSX.writeFile(workbook, "Planner_Pro_Dati_Completi.xlsx");
     }
   </script>
 
