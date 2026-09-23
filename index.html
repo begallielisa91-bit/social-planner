@@ -93,7 +93,6 @@
     .preview-text { font-size: 13px; line-height: 1.4; white-space: pre-wrap; min-height: 50px; }
     .preview-media { width: 100%; border-radius: 8px; margin-top: 10px; display: none; max-height: 220px; object-fit: cover; }
 
-    /* ELENCO SCHEDE */
     .posts-list { display: flex; flex-direction: column; gap: 12px; }
     .post-card-item {
       background: white; padding: 15px; border-radius: 12px; border-left: 5px solid #6c63ff;
@@ -297,7 +296,7 @@
       </div>
     </div>
 
-    <!-- Sezione Prezzi & Vendite Libri (Con Pulsanti Indipendenti) -->
+    <!-- Sezione Prezzi & Vendite Libri -->
     <div id="sec-libri" class="section">
       <div class="top">
         <h1>🏷️ Prezzi & Vendite Libri</h1>
@@ -306,7 +305,7 @@
 
       <div class="editor-container">
         <div class="form-box">
-          <!-- PARTE 1: Acquisto / Stampa -->
+          <!-- PARTE 1: Acquisto / Stampa con Quantità -->
           <div class="form-section-title">1. Dati Libro & Acquisto</div>
           <div class="form-group">
             <label>Titolo del Libro</label>
@@ -319,7 +318,12 @@
           </div>
 
           <div class="form-group">
-            <label>Costo di Acquisto (€)</label>
+            <label>Quantità Acquistata / Stampata</label>
+            <input type="number" id="bk-buy-qty" placeholder="Es. 20" value="1">
+          </div>
+
+          <div class="form-group">
+            <label>Costo di Acquisto Unitario (€)</label>
             <input type="number" step="0.01" id="bk-buy-price" placeholder="Es. 4.50">
           </div>
 
@@ -329,9 +333,7 @@
           <div class="form-section-title">2. Canale di Vendita</div>
           <div class="form-group">
             <label>Seleziona Libro Registrato</label>
-            <select id="bk-select-existing">
-              <!-- Popolato dinamicamente -->
-            </select>
+            <select id="bk-select-existing"></select>
           </div>
 
           <div class="form-group">
@@ -354,7 +356,7 @@
           </div>
 
           <div class="form-group">
-            <label>Prezzo di Vendita (€)</label>
+            <label>Prezzo di Vendita Unitario (€)</label>
             <input type="number" step="0.01" id="bk-sale-price" placeholder="Es. 12.00">
           </div>
 
@@ -604,9 +606,10 @@
     function addBookBuyRecord() {
       const title = document.getElementById('bk-title').value;
       const buyDate = document.getElementById('bk-buy-date').value;
+      const qty = parseInt(document.getElementById('bk-buy-qty').value);
       const buyPrice = parseFloat(document.getElementById('bk-buy-price').value);
 
-      if (!title || !buyDate || isNaN(buyPrice)) {
+      if (!title || !buyDate || isNaN(qty) || isNaN(buyPrice)) {
         alert('Compila tutti i campi di acquisto del libro!');
         return;
       }
@@ -615,6 +618,7 @@
         id: Date.now(),
         title,
         buyDate,
+        qty,
         buyPrice,
         saleType: '',
         salePrice: null,
@@ -631,6 +635,7 @@
 
       document.getElementById('bk-title').value = '';
       document.getElementById('bk-buy-date').value = '';
+      document.getElementById('bk-buy-qty').value = '1';
       document.getElementById('bk-buy-price').value = '';
 
       alert('Dati acquisto libro salvati!');
@@ -678,7 +683,7 @@
       bookRecords.forEach(b => {
         const opt = document.createElement('option');
         opt.value = b.id;
-        opt.innerText = `${b.title} (Acquistato il ${b.buyDate})`;
+        opt.innerText = `${b.title} (${b.qty} pz del ${b.buyDate})`;
         select.appendChild(opt);
       });
     }
@@ -699,15 +704,20 @@
         let saleText = '<em style="color:#888;">Non ancora venduto</em>';
         let profitText = '';
 
+        const totalCost = (bk.qty * bk.buyPrice).toFixed(2);
+
         if (bk.salePrice !== null) {
+          const totalRevenue = (bk.qty * bk.salePrice).toFixed(2);
+          const totalProfit = (totalRevenue - totalCost).toFixed(2);
+
           if (bk.saleType === 'Amazon') {
-            saleText = `Venduto su <strong>Amazon</strong> a <strong>€${bk.salePrice.toFixed(2)}</strong>`;
+            saleText = `Venduto su <strong>Amazon</strong> a <strong>€${bk.salePrice.toFixed(2)}</strong>/pz (Tot. Ricavo: €${totalRevenue})`;
           } else {
-            saleText = `Venduto di persona il <strong>${bk.saleDate}</strong> a <strong>${bk.clientName}</strong> per <strong>€${bk.salePrice.toFixed(2)}</strong>`;
+            saleText = `Venduto di persona il <strong>${bk.saleDate}</strong> a <strong>${bk.clientName}</strong> per <strong>€${bk.salePrice.toFixed(2)}</strong>/pz (Tot. Ricavo: €${totalRevenue})`;
           }
-          const profit = (bk.salePrice - bk.buyPrice).toFixed(2);
-          profitText = `<small style="color:${profit >= 0 ? '#059669' : '#dc2626'}; font-weight:bold; display:block; margin-top:6px;">
-            Margine Singolo: €${profit}
+
+          profitText = `<small style="color:${totalProfit >= 0 ? '#059669' : '#dc2626'}; font-weight:bold; display:block; margin-top:6px;">
+            Margine Totale Lotti: €${totalProfit}
           </small>`;
         }
 
@@ -715,7 +725,7 @@
           <div class="post-card-info">
             <span class="post-card-badge badge-book">Libro & Prezzi</span>
             <div style="margin-top:6px; font-weight:bold; font-size:15px; color:#0f172a;">Libro: ${bk.title}</div>
-            <div style="margin-top:4px; color:#475569;">Acquistato/Stampato il <strong>${bk.buyDate}</strong> a <strong>€${bk.buyPrice.toFixed(2)}</strong></div>
+            <div style="margin-top:4px; color:#475569;">Acquistato/Stampato: <strong>${bk.qty} pz</strong> il <strong>${bk.buyDate}</strong> a <strong>€${bk.buyPrice.toFixed(2)}</strong>/pz (Tot. Costo: €${totalCost})</div>
             <div style="margin-top:4px; color:#1e293b;">${saleText}</div>
             ${profitText}
           </div>
@@ -910,7 +920,6 @@
       document.getElementById('count-newsletters').innerText = scheduledNewsletters.length;
       document.getElementById('count-books-total').innerText = bookRecords.length;
 
-      // Calcolo pezzi stock e valore totale
       let totalStockQty = 0;
       let totalStockVal = 0;
       stockItems.forEach(i => {
@@ -919,7 +928,6 @@
       });
       document.getElementById('stat-stock-value').innerText = '€' + totalStockVal.toFixed(2);
 
-      // Calcolo Profitto Netto (finanze + margine libri)
       let totalIncome = 0;
       let totalExpense = 0;
 
@@ -929,8 +937,8 @@
       });
 
       bookRecords.forEach(b => {
-        totalExpense += b.buyPrice;
-        if (b.salePrice !== null) totalIncome += b.salePrice;
+        totalExpense += (b.qty * b.buyPrice);
+        if (b.salePrice !== null) totalIncome += (b.qty * b.salePrice);
       });
 
       const net = totalIncome - totalExpense;
