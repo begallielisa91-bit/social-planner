@@ -297,7 +297,7 @@
       </div>
     </div>
 
-    <!-- Sezione Prezzi & Vendite Libri (Divisa in 2 Parti) -->
+    <!-- Sezione Prezzi & Vendite Libri (Con Pulsanti Indipendenti) -->
     <div id="sec-libri" class="section">
       <div class="top">
         <h1>🏷️ Prezzi & Vendite Libri</h1>
@@ -323,8 +323,17 @@
             <input type="number" step="0.01" id="bk-buy-price" placeholder="Es. 4.50">
           </div>
 
+          <button class="btn-primary" style="background:#6c63ff; margin-bottom: 25px;" onclick="addBookBuyRecord()">Salva Dati Libro di Acquisto</button>
+
           <!-- PARTE 2: Canale di Vendita -->
-          <div class="form-section-title" style="margin-top:20px;">2. Canale di Vendita</div>
+          <div class="form-section-title">2. Canale di Vendita</div>
+          <div class="form-group">
+            <label>Seleziona Libro Registrato</label>
+            <select id="bk-select-existing">
+              <!-- Popolato dinamicamente -->
+            </select>
+          </div>
+
           <div class="form-group">
             <label>Seleziona Canale</label>
             <select id="bk-sale-type" onchange="toggleBookSaleFields()">
@@ -333,7 +342,6 @@
             </select>
           </div>
 
-          <!-- Campi specifici Vendita di Persona -->
           <div id="bk-person-fields" style="display:none; background:#f8fafc; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #e2e8f0;">
             <div class="form-group">
               <label>Data di Vendita</label>
@@ -350,7 +358,7 @@
             <input type="number" step="0.01" id="bk-sale-price" placeholder="Es. 12.00">
           </div>
 
-          <button class="btn-primary" style="background:#7c3aed;" onclick="addBookRecord()">Salva Scheda Libro</button>
+          <button class="btn-primary" style="background:#7c3aed;" onclick="addBookSaleRecord()">Salva Vendita Libro</button>
         </div>
 
         <div>
@@ -456,6 +464,7 @@
       renderStockList();
       renderFinanceList();
       renderBooksList();
+      updateBookDropdown();
       updateDashboardCounts();
     };
 
@@ -592,23 +601,13 @@
       personFields.style.display = saleType === 'Persona' ? 'block' : 'none';
     }
 
-    function addBookRecord() {
+    function addBookBuyRecord() {
       const title = document.getElementById('bk-title').value;
       const buyDate = document.getElementById('bk-buy-date').value;
       const buyPrice = parseFloat(document.getElementById('bk-buy-price').value);
-      const saleType = document.getElementById('bk-sale-type').value;
-      const salePrice = parseFloat(document.getElementById('bk-sale-price').value);
 
-      const saleDate = document.getElementById('bk-sale-date').value;
-      const clientName = document.getElementById('bk-client-name').value;
-
-      if (!title || !buyDate || isNaN(buyPrice) || isNaN(salePrice)) {
-        alert('Compila tutti i campi obbligatori del libro!');
-        return;
-      }
-
-      if (saleType === 'Persona' && (!saleDate || !clientName)) {
-        alert('Inserisci la data di vendita e il nome del cliente per la vendita di persona!');
+      if (!title || !buyDate || isNaN(buyPrice)) {
+        alert('Compila tutti i campi di acquisto del libro!');
         return;
       }
 
@@ -617,26 +616,71 @@
         title,
         buyDate,
         buyPrice,
-        saleType,
-        salePrice,
-        saleDate,
-        clientName
+        saleType: '',
+        salePrice: null,
+        saleDate: '',
+        clientName: ''
       };
 
       bookRecords.push(newBook);
       localStorage.setItem('sp_books', JSON.stringify(bookRecords));
 
       renderBooksList();
+      updateBookDropdown();
       updateDashboardCounts();
 
       document.getElementById('bk-title').value = '';
       document.getElementById('bk-buy-date').value = '';
       document.getElementById('bk-buy-price').value = '';
-      document.getElementById('bk-sale-price').value = '';
-      document.getElementById('bk-sale-date').value = '';
-      document.getElementById('bk-client-name').value = '';
 
-      alert('Libro registrato con successo!');
+      alert('Dati acquisto libro salvati!');
+    }
+
+    function addBookSaleRecord() {
+      const bookId = parseInt(document.getElementById('bk-select-existing').value);
+      const saleType = document.getElementById('bk-sale-type').value;
+      const salePrice = parseFloat(document.getElementById('bk-sale-price').value);
+      const saleDate = document.getElementById('bk-sale-date').value;
+      const clientName = document.getElementById('bk-client-name').value;
+
+      if (!bookId || isNaN(salePrice)) {
+        alert('Seleziona un libro e inserisci il prezzo di vendita!');
+        return;
+      }
+
+      if (saleType === 'Persona' && (!saleDate || !clientName)) {
+        alert('Inserisci data e nome cliente per la vendita di persona!');
+        return;
+      }
+
+      const book = bookRecords.find(b => b.id === bookId);
+      if (book) {
+        book.saleType = saleType;
+        book.salePrice = salePrice;
+        book.saleDate = saleDate;
+        book.clientName = clientName;
+
+        localStorage.setItem('sp_books', JSON.stringify(bookRecords));
+        renderBooksList();
+        updateDashboardCounts();
+
+        document.getElementById('bk-sale-price').value = '';
+        document.getElementById('bk-sale-date').value = '';
+        document.getElementById('bk-client-name').value = '';
+
+        alert('Vendita registrata con successo!');
+      }
+    }
+
+    function updateBookDropdown() {
+      const select = document.getElementById('bk-select-existing');
+      select.innerHTML = '<option value="">-- Seleziona un libro --</option>';
+      bookRecords.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.innerText = `${b.title} (Acquistato il ${b.buyDate})`;
+        select.appendChild(opt);
+      });
     }
 
     function renderBooksList() {
@@ -652,14 +696,20 @@
         const div = document.createElement('div');
         div.className = 'post-card-item book-item';
 
-        let saleText = '';
-        if (bk.saleType === 'Amazon') {
-          saleText = `Venduto su <strong>Amazon</strong> a <strong>€${bk.salePrice.toFixed(2)}</strong>`;
-        } else {
-          saleText = `Venduto di persona il <strong>${bk.saleDate}</strong> a <strong>${bk.clientName}</strong> per <strong>€${bk.salePrice.toFixed(2)}</strong>`;
-        }
+        let saleText = '<em style="color:#888;">Non ancora venduto</em>';
+        let profitText = '';
 
-        const profit = (bk.salePrice - bk.buyPrice).toFixed(2);
+        if (bk.salePrice !== null) {
+          if (bk.saleType === 'Amazon') {
+            saleText = `Venduto su <strong>Amazon</strong> a <strong>€${bk.salePrice.toFixed(2)}</strong>`;
+          } else {
+            saleText = `Venduto di persona il <strong>${bk.saleDate}</strong> a <strong>${bk.clientName}</strong> per <strong>€${bk.salePrice.toFixed(2)}</strong>`;
+          }
+          const profit = (bk.salePrice - bk.buyPrice).toFixed(2);
+          profitText = `<small style="color:${profit >= 0 ? '#059669' : '#dc2626'}; font-weight:bold; display:block; margin-top:6px;">
+            Margine Singolo: €${profit}
+          </small>`;
+        }
 
         div.innerHTML = `
           <div class="post-card-info">
@@ -667,9 +717,7 @@
             <div style="margin-top:6px; font-weight:bold; font-size:15px; color:#0f172a;">Libro: ${bk.title}</div>
             <div style="margin-top:4px; color:#475569;">Acquistato/Stampato il <strong>${bk.buyDate}</strong> a <strong>€${bk.buyPrice.toFixed(2)}</strong></div>
             <div style="margin-top:4px; color:#1e293b;">${saleText}</div>
-            <small style="color:${profit >= 0 ? '#059669' : '#dc2626'}; font-weight:bold; display:block; margin-top:6px;">
-              Margine Singolo: €${profit}
-            </small>
+            ${profitText}
           </div>
           <button class="btn-delete-item" onclick="deleteBookRecord(${bk.id})">Elimina</button>
         `;
@@ -681,6 +729,7 @@
       bookRecords = bookRecords.filter(b => b.id !== id);
       localStorage.setItem('sp_books', JSON.stringify(bookRecords));
       renderBooksList();
+      updateBookDropdown();
       updateDashboardCounts();
     }
 
@@ -881,7 +930,7 @@
 
       bookRecords.forEach(b => {
         totalExpense += b.buyPrice;
-        totalIncome += b.salePrice;
+        if (b.salePrice !== null) totalIncome += b.salePrice;
       });
 
       const net = totalIncome - totalExpense;
