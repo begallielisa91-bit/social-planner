@@ -637,17 +637,20 @@
 
     function schedulePost() {
       const platform = document.getElementById('channel-select').value;
-      const date = document.getElementById('post-date').value;
+      const rawDate = document.getElementById('post-date').value;
       const topic = document.getElementById('post-topic').value || '-';
       const text = document.getElementById('post-text').value;
       const link = document.getElementById('post-link').value || '-';
 
-      if (!text || !date) { alert('Inserisci un testo e seleziona una data!'); return; }
+      if (!text) { 
+        alert('Inserisci il testo del post!'); 
+        return; 
+      }
 
       const newPost = {
         id: Date.now(),
         platform,
-        date,
+        date: rawDate || '',
         topic,
         text,
         link,
@@ -959,18 +962,18 @@
       updateDashboardCounts();
     }
 
-    /* RENDERING CALENDARIO SOCIAL (STILE TABELLA FOTO) */
+    /* RENDERING CALENDARIO SOCIAL */
     function renderPostsList() {
       const tbody = document.getElementById('cal-posts-body');
       tbody.innerHTML = '';
 
-      // Mostra MESE / ANNO in testata calcolato in base al primo post, oppure mese corrente
-      let labelMonthYear = "SETTEMBRE / 2026";
-      if (scheduledPosts.length > 0) {
-        const firstPostDate = new Date(scheduledPosts[0].date);
-        if (!isNaN(firstPostDate)) {
+      // Mostra MESE / ANNO in testata
+      let labelMonthYear = "MESE / ANNO";
+      if (scheduledPosts.length > 0 && scheduledPosts[0].date) {
+        const d = new Date(scheduledPosts[0].date);
+        if (!isNaN(d)) {
           const opt = { month: 'long', year: 'numeric' };
-          labelMonthYear = firstPostDate.toLocaleDateString('it-IT', opt).toUpperCase();
+          labelMonthYear = d.toLocaleDateString('it-IT', opt).toUpperCase();
         }
       }
       document.getElementById('cal-month-year').innerText = labelMonthYear;
@@ -983,14 +986,16 @@
       scheduledPosts.forEach(post => {
         const tr = document.createElement('tr');
 
-        // Giorno / Ora
-        let dayTimeStr = 'Data non valida';
+        // Formattazione Giorno / Ora tollerante
+        let dayTimeStr = 'Da programmare';
         if (post.date) {
           const d = new Date(post.date);
-          if (!isNaN(d)) {
+          if (!isNaN(d.getTime())) {
             const dayName = d.toLocaleDateString('it-IT', { day: '2-digit', month: 'long' });
             const hourName = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
             dayTimeStr = `<strong>${dayName}</strong><br><span style="color:#64748b; font-size:11px;">${hourName}</span>`;
+          } else {
+            dayTimeStr = `<strong>${post.date.replace('T', ' ')}</strong>`;
           }
         }
 
@@ -1002,7 +1007,7 @@
         else socialBadge = `<span class="post-card-badge">${post.platform}</span>`;
 
         // Link
-        let linkContent = post.link === '-' ? '-' : `<a href="https://${post.link.replace(/^(https?:\/\/)?/, '')}" target="_blank" style="color: #0d9488; font-weight: 500; text-decoration: underline;">Apri link</a>`;
+        let linkContent = (post.link === '-' || !post.link) ? '-' : `<a href="https://${post.link.replace(/^(https?:\/\/)?/, '')}" target="_blank" style="color: #0d9488; font-weight: 500; text-decoration: underline;">Apri link</a>`;
 
         // Checkbox + Timestamp
         const isChecked = post.sent ? 'checked' : '';
