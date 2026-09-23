@@ -2,128 +2,53 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Social, Email & Business Planner Pro</title>
+
+  <!-- Libreria SheetJS per l'esportazione nativa in formato .xlsx -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
+    * { box-sizing: border-box; }
     body {
-      background-color: #f8f9fe;
-      color: #333;
-      padding: 20px 20px 80px 20px;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f5f7fb;
+      color: #25283d;
+      padding-bottom: 75px;
     }
 
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
+    #auth-screen {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #f5f7fb; display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 20px;
+    }
+    .auth-box {
+      background: white; padding: 30px 20px; border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center;
+    }
+    .auth-box h2 { margin-top: 0; color: #6c63ff; margin-bottom: 20px; }
+    .auth-box input {
+      width: 100%; padding: 12px; margin-bottom: 15px;
+      border: 1px solid #e0e0e0; border-radius: 8px; font-size: 15px; outline: none;
     }
 
-    h1 {
-      font-size: 26px;
-      font-weight: 700;
-      color: #1a1f36;
-      margin-bottom: 4px;
+    .sidebar {
+      position: fixed; left: 0; top: 0; width: 250px; height: 100vh;
+      background: #ffffff; padding: 25px 15px; box-shadow: 3px 0 15px rgba(0,0,0,0.06);
+      z-index: 100; display: flex; flex-direction: column; justify-content: space-between;
     }
-
-    .subtitle {
-      font-size: 14px;
-      color: #6b7280;
-      margin-bottom: 24px;
+    .logo { font-size: 20px; font-weight: bold; margin-bottom: 25px; color: #6c63ff; }
+    .menu a {
+      display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+      margin-bottom: 6px; border-radius: 10px; color: #555566; font-size: 15px;
+      font-weight: 500; cursor: pointer; text-decoration: none;
     }
+    .menu a.active { background: #eeeaff; color: #6c63ff; font-weight: 600; }
 
-    /* Griglia Statistiche */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    @media (min-width: 768px) {
-      .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    }
-
-    .card-title {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: #6b7280;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-    }
-
-    .card-value {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1a1f36;
-    }
-
-    .card-value.green {
-      color: #10b981;
-    }
-
-    /* Sezione Esportazione */
-    .export-card {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-      margin-bottom: 20px;
-    }
-
-    .export-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 16px;
-      font-weight: 700;
-      color: #1a1f36;
-      margin-bottom: 8px;
-    }
-
-    .export-desc {
-      font-size: 13px;
-      color: #6b7280;
-      line-height: 1.4;
-      margin-bottom: 16px;
-    }
-
-    .btn-excel {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background-color: #10b981;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .btn-excel:hover {
-      background-color: #059669;
-    }
-
-    /* Barra di Navigazione Mobile (Corretta) */
+    /* Barra di Navigazione Mobile (Aggiornata e Corretta) */
     .mobile-nav {
-      display: flex;
+      display: none;
       position: fixed;
       bottom: 0;
       left: 0;
@@ -135,7 +60,6 @@
       justify-content: space-around;
       align-items: center;
     }
-
     .mobile-nav a {
       display: flex;
       flex-direction: column;
@@ -148,88 +72,1161 @@
       cursor: pointer;
       text-align: center;
     }
-
     .mobile-nav a.active {
       color: #6c63ff;
       font-weight: bold;
     }
-
     .mobile-nav span {
       font-size: 20px;
       margin-bottom: 2px;
       display: block;
     }
 
-    @media (min-width: 768px) {
-      .mobile-nav {
-        display: none;
-      }
+    .main { margin-left: 250px; padding: 30px; }
+    .top h1 { margin: 0 0 8px; font-size: 24px; }
+    .top p { margin: 0 0 20px; color: #777788; font-size: 14px; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .card h3 { margin: 0 0 8px; font-size: 12px; color: #888899; text-transform: uppercase; }
+    .card .value { font-size: 22px; font-weight: bold; }
+
+    .home-export-card {
+      background: white; padding: 20px; border-radius: 12px; margin-top: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: space-between; gap: 15px;
+    }
+
+    .editor-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+    .form-box, .preview-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+    .form-group select, .form-group textarea, .form-group input {
+      width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px;
+    }
+    .form-group textarea { height: 90px; }
+
+    .btn-tools { display: flex; gap: 10px; margin-bottom: 15px; }
+    .btn-ai, .btn-canva {
+      border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 600;
+      cursor: pointer; text-decoration: none; text-align: center; flex: 1;
+    }
+    .btn-ai { background: #6c63ff; color: #ffffff !important; }
+    .btn-canva { background: #00c4cc; color: #ffffff !important; }
+    .btn-primary {
+      background: #6c63ff; color: #ffffff !important; border: none; padding: 12px;
+      border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
+    }
+
+    .preview-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .preview-avatar { width: 36px; height: 36px; border-radius: 50%; background: #6c63ff; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .preview-text { font-size: 13px; line-height: 1.4; white-space: pre-wrap; min-height: 50px; }
+    .preview-media { width: 100%; border-radius: 8px; margin-top: 10px; display: none; max-height: 220px; object-fit: cover; }
+
+    .posts-list { display: flex; flex-direction: column; gap: 12px; }
+    .post-card-item {
+      background: white; padding: 15px; border-radius: 12px; border-left: 5px solid #6c63ff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    }
+    .post-card-item.newsletter-item { border-left-color: #0284c7; }
+    .post-card-item.income-item { border-left-color: #10b981; }
+    .post-card-item.expense-item { border-left-color: #ef4444; }
+    .post-card-item.stock-item { border-left-color: #f59e0b; }
+    .post-card-item.book-item { border-left-color: #8b5cf6; }
+
+    .post-card-info { font-size: 13px; flex: 1; }
+    
+    .post-card-badge {
+      background: #4c1d95; color: #ffffff !important; font-weight: bold; padding: 5px 10px; border-radius: 6px; font-size: 12px; display: inline-block;
+    }
+    .post-card-badge.badge-nl { background: #0369a1; color: #ffffff !important; }
+    .post-card-badge.badge-inc { background: #059669; color: #ffffff !important; }
+    .post-card-badge.badge-exp { background: #dc2626; color: #ffffff !important; }
+    .post-card-badge.badge-stock { background: #d97706; color: #ffffff !important; }
+    .post-card-badge.badge-book { background: #7c3aed; color: #ffffff !important; }
+
+    .nl-body-preview {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px;
+      font-size: 13px; color: #1e293b; line-height: 1.4; white-space: pre-wrap; word-break: break-word;
+    }
+
+    .form-section-title {
+      font-size: 14px; font-weight: bold; color: #7c3aed; margin-bottom: 10px; border-bottom: 2px solid #f3e8ff; padding-bottom: 4px;
+    }
+
+    .btn-delete-item { background: #ff4d4f; color: #ffffff !important; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; }
+
+    /* VISUAL DI CALENDARIO SOCIAL */
+    .cal-banner {
+      background: linear-gradient(135deg, #0f766e, #0d9488);
+      color: white; padding: 25px 20px; border-radius: 16px 16px 0 0; text-align: center;
+      position: relative; overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .cal-decor-left, .cal-decor-right {
+      position: absolute; top: 10px; font-size: 26px;
+    }
+    .cal-decor-left { left: 20px; }
+    .cal-decor-right { right: 20px; }
+    .cal-logo {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; margin-bottom: 4px;
+    }
+    .cal-title-main { font-family: 'Georgia', serif; font-size: 22px; font-weight: bold; margin: 4px 0; }
+    .cal-title-sub { font-family: 'Georgia', serif; font-size: 32px; letter-spacing: 3px; font-weight: bold; text-transform: uppercase; }
+
+    .table-container {
+      background: #ffffff; border-radius: 0 0 16px 16px; overflow-x: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; border-top: none;
+    }
+    .cal-table {
+      width: 100%; border-collapse: collapse; min-width: 900px;
+    }
+    .cal-table th {
+      background: #115e59; color: #ffffff; text-align: center; font-weight: 600;
+      font-size: 14px; padding: 14px 10px; border: 1px solid #0d9488;
+    }
+    .cal-table td {
+      padding: 14px 10px; border: 1px solid #2dd4bf; text-align: center; font-size: 13px; color: #1e293b;
+      vertical-align: middle; word-break: break-word;
+    }
+    .cal-table tr:nth-child(even) { background: #f0fdfa; }
+
+    .cal-social-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 6px; font-weight: bold; color: white; font-size: 14px;
+    }
+    .cal-social-icon.facebook { background: #1877f2; }
+    .cal-social-icon.instagram { background: #e1306c; }
+    .cal-social-icon.linkedin { background: #0077b5; }
+
+    .cal-checkbox {
+      width: 22px; height: 22px; cursor: pointer; accent-color: #0d9488;
+    }
+    .date-badge {
+      display: block; font-size: 11px; color: #0d9488; font-weight: bold; margin-top: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .mobile-nav { display: flex; }
+      .main { margin-left: 0; padding: 20px 15px; }
+      .editor-container { grid-template-columns: 1fr; }
+      .home-export-card { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>Dashboard</h1>
-    <p class="subtitle">Panoramica dei tuoi contenuti e attività.</p>
-
-    <!-- Griglia Statistiche -->
-    <div class="stats-grid">
-      <div class="card">
-        <div class="card-title">POST PROGRAMMATI</div>
-        <div class="card-value">10</div>
-      </div>
-      <div class="card">
-        <div class="card-title">NEWSLETTER</div>
-        <div class="card-value">2</div>
-      </div>
-      <div class="card">
-        <div class="card-title">LIBRI REGISTRATI</div>
-        <div class="card-value">2</div>
-      </div>
-      <div class="card">
-        <div class="card-title">PROFITTO NETTO</div>
-        <div class="card-value green">€10.00</div>
-      </div>
+  <!-- Login -->
+  <div id="auth-screen">
+    <div class="auth-box">
+      <h2>🚀 Planner Pro</h2>
+      <p style="color:#666; font-size:13px; margin-bottom:15px;">Accedi al pannello di controllo</p>
+      <input type="text" id="login-username" placeholder="Nome utente">
+      <input type="password" id="login-password" placeholder="Password">
+      <button class="btn-primary" onclick="login()">Accedi</button>
     </div>
+  </div>
 
-    <!-- Sezione Esportazione Excel -->
-    <div class="export-card">
-      <div class="export-header">
-        📊 Esportazione Dati Completa
+  <!-- Sidebar Desktop -->
+  <div class="sidebar">
+    <div>
+      <div class="logo">🚀 Planner Pro</div>
+      <div class="menu">
+        <a onclick="showSection('dashboard')" id="nav-dashboard" class="active">🏠 Dashboard</a>
+        <a onclick="showSection('calendario')" id="nav-calendario">📅 Agenda Social</a>
+        <a onclick="showSection('crea-post')" id="nav-crea-post">✍️ Crea post</a>
+        <a onclick="showSection('newsletter')" id="nav-newsletter">📧 Newsletter</a>
+        <a onclick="showSection('libri')" id="nav-libri">🏷️ Prezzi Libri</a>
+        <a onclick="showSection('magazzino')" id="nav-magazzino">📦 Magazzino & Finanze</a>
+        <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
       </div>
-      <p class="export-desc">
-        Scarica un report Excel in formato nativo .xlsx con fogli separati per Social, Newsletter, Libri, Stock e Finanze.
-      </p>
-      <button class="btn-excel">
-        🎁 Scarica Dati Excel (.xlsx)
+      
+      <button class="btn-primary" style="background:#10b981; margin-top: 15px;" onclick="exportToExcel()">
+        📥 Scarica Excel (.xlsx)
       </button>
     </div>
   </div>
 
-  <!-- Barra di Navigazione Mobile -->
-  <nav class="mobile-nav">
-    <a href="#" class="active">
+  <!-- Navigation Bar Mobile -->
+  <div class="mobile-nav">
+    <a onclick="showSection('dashboard')" id="mnav-dashboard" class="active">
       <span>🏠</span>
       Home
     </a>
-    <a href="#">
+    <a onclick="showSection('calendario')" id="mnav-calendario">
       <span>📅</span>
       Social
     </a>
-    <a href="#">
-      <span>✏️</span>
+    <a onclick="showSection('crea-post')" id="mnav-crea-post">
+      <span>✍️</span>
       Post
     </a>
-    <a href="#">
+    <a onclick="showSection('libri')" id="mnav-libri">
       <span>🏷️</span>
       Prezzi
     </a>
-    <a href="#">
+    <a onclick="showSection('magazzino')" id="mnav-magazzino">
       <span>📦</span>
       Stock
     </a>
-  </nav>
+  </div>
+
+  <!-- Contenuto Principale -->
+  <div class="main">
+
+    <!-- Dashboard (HOME) -->
+    <div id="sec-dashboard" class="section active">
+      <div class="top">
+        <h1>Dashboard</h1>
+        <p>Panoramica dei tuoi contenuti e attività.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Post Programmati</h3>
+          <div class="value" id="count-scheduled">0</div>
+        </div>
+        <div class="card">
+          <h3>Newsletter</h3>
+          <div class="value" id="count-newsletters">0</div>
+        </div>
+        <div class="card">
+          <h3>Libri Registrati</h3>
+          <div class="value" id="count-books-total">0</div>
+        </div>
+        <div class="card">
+          <h3>Profitto Netto</h3>
+          <div class="value" id="count-profit-net" style="color:#10b981;">€0.00</div>
+        </div>
+      </div>
+
+      <!-- BOX DOWNLOAD EXCEL IN HOME PAGE -->
+      <div class="home-export-card">
+        <div>
+          <h3 style="margin: 0 0 6px 0; font-size: 16px; color: #1e293b;">📊 Esportazione Dati Completa</h3>
+          <p style="margin: 0; color: #64748b; font-size: 13px;">Scarica un report Excel in formato nativo <strong>.xlsx</strong> con fogli separati per Social, Newsletter, Libri, Stock e Finanze.</p>
+        </div>
+        <button class="btn-primary" style="background:#10b981; width: auto; padding: 12px 24px; white-space: nowrap;" onclick="exportToExcel()">
+          📥 Scarica Dati Excel (.xlsx)
+        </button>
+      </div>
+    </div>
+
+    <!-- Crea Post Social -->
+    <div id="sec-crea-post" class="section">
+      <div class="top">
+        <h1>Crea Post Social</h1>
+      </div>
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-group">
+            <label>Canale Social</label>
+            <select id="channel-select" onchange="updatePreview()">
+              <option value="Instagram">Instagram</option>
+              <option value="Facebook">Facebook</option>
+              <option value="LinkedIn">LinkedIn</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Data e Ora di Pubblicazione</label>
+            <input type="datetime-local" id="post-date">
+          </div>
+
+          <div class="form-group">
+            <label>Argomento (Topic)</label>
+            <input type="text" id="post-topic" placeholder="Es. Nuovi arrivi in libreria o Promo fine mese">
+          </div>
+
+          <div class="btn-tools">
+            <button class="btn-ai" onclick="generateAiText()">✨ Testo AI</button>
+            <a class="btn-canva" href="https://www.canva.com" target="_blank">🎨 Canva</a>
+          </div>
+
+          <div class="form-group">
+            <label>Post (Testo / Copy)</label>
+            <textarea id="post-text" placeholder="Scrivi il testo del post..." oninput="updatePreview()"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Link / URL</label>
+            <input type="text" id="post-link" placeholder="Es. www.amazon.it/libro o articolo di blog">
+          </div>
+
+          <div class="form-group">
+            <label>Foto o Video</label>
+            <input type="file" id="post-file" accept="image/*,video/*" onchange="previewMedia(event)">
+          </div>
+
+          <button class="btn-primary" onclick="schedulePost()">Salva e Programma Post</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Anteprima</h3>
+          <div class="preview-box">
+            <div class="preview-header">
+              <div class="preview-avatar">SP</div>
+              <div>
+                <strong>Brand</strong><br>
+                <small id="preview-platform" style="color:#777;">Instagram</small>
+              </div>
+            </div>
+            <div class="preview-text" id="preview-content">Anteprima testo...</div>
+            <img id="img-preview" class="preview-media" alt="Anteprima Immagine">
+            <video id="video-preview" class="preview-media" controls></video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Newsletter -->
+    <div id="sec-newsletter" class="section">
+      <div class="top">
+        <h1>Pianifica Newsletter</h1>
+        <p>Crea e organizza le tue e-mail per gli iscritti.</p>
+      </div>
+
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-group">
+            <label>Oggetto della Mail</label>
+            <input type="text" id="nl-subject" placeholder="Es. 📬 Novità del mese + regalo speciale!">
+          </div>
+
+          <div class="btn-tools">
+            <button class="btn-ai" onclick="generateAiNewsletter()">✨ Bozza AI Newsletter</button>
+          </div>
+
+          <div class="form-group">
+            <label>Contenuto E-mail</label>
+            <textarea id="nl-body" placeholder="Scrivi qui il testo della mail..." style="height:140px;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Data e Ora di Invio</label>
+            <input type="datetime-local" id="nl-date">
+          </div>
+
+          <button class="btn-primary" style="background:#0284c7;" onclick="scheduleNewsletter()">Programma Newsletter</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Newsletter Pianificate</h3>
+          <div class="posts-list" id="newsletter-container-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prezzi & Vendite Libri -->
+    <div id="sec-libri" class="section">
+      <div class="top">
+        <h1>🏷️ Prezzi & Vendite Libri</h1>
+        <p>Registra e monitora acquisti e vendite dei tuoi libri.</p>
+      </div>
+
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-section-title">1. Dati Libro & Acquisto</div>
+          <div class="form-group">
+            <label>Titolo del Libro</label>
+            <input type="text" id="bk-title" placeholder="Es. I colori di casa delle filastrocche">
+          </div>
+
+          <div class="form-group">
+            <label>Data di Acquisto / Stampa</label>
+            <input type="date" id="bk-buy-date">
+          </div>
+
+          <div class="form-group">
+            <label>Quantità Acquistata / Stampata</label>
+            <input type="number" id="bk-buy-qty" placeholder="Es. 20" value="1">
+          </div>
+
+          <div class="form-group">
+            <label>Costo di Acquisto Unitario (€)</label>
+            <input type="number" step="0.01" id="bk-buy-price" placeholder="Es. 4.50">
+          </div>
+
+          <button class="btn-primary" style="background:#6c63ff; margin-bottom: 25px;" onclick="addBookBuyRecord()">Salva Dati Libro di Acquisto</button>
+
+          <div class="form-section-title">2. Canale di Vendita</div>
+          
+          <div class="form-group">
+            <label>Titolo del Libro Venduto</label>
+            <input type="text" id="bk-custom-title" placeholder="Es. I colori di casa delle filastrocche">
+          </div>
+
+          <div class="form-group">
+            <label>Seleziona Canale</label>
+            <select id="bk-sale-type" onchange="toggleBookSaleFields()">
+              <option value="Amazon">Venduto su Amazon</option>
+              <option value="Persona">Venduto di Persona</option>
+            </select>
+          </div>
+
+          <div id="bk-person-fields" style="display:none; background:#f8fafc; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #e2e8f0;">
+            <div class="form-group">
+              <label>Data di Vendita</label>
+              <input type="date" id="bk-sale-date">
+            </div>
+            <div class="form-group">
+              <label>Nome del Cliente</label>
+              <input type="text" id="bk-client-name" placeholder="Es. Maria Rossi">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Prezzo di Vendita Unitario (€)</label>
+            <input type="number" step="0.01" id="bk-sale-price" placeholder="Es. 12.00">
+          </div>
+
+          <button class="btn-primary" style="background:#7c3aed;" onclick="addBookSaleRecord()">Salva Vendita Libro</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Registro Libri & Vendite</h3>
+          <div class="posts-list" id="books-container-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Magazzino & Finanze -->
+    <div id="sec-magazzino" class="section">
+      <div class="top">
+        <h1>Gestione Magazzino & Contabilità</h1>
+        <p>Monitora scorte di magazzino, entrate e uscite.</p>
+      </div>
+
+      <div class="editor-container">
+        <div class="form-box">
+          <h3 style="margin-top:0; font-size:16px; color:#d97706;">📦 Aggiungi Prodotto in Stock</h3>
+          <div class="form-group">
+            <label>Nome Prodotto / Articolo</label>
+            <input type="text" id="st-name" placeholder="Es. Libro / Materiale decoupage">
+          </div>
+          <div class="form-group">
+            <label>Quantità Disponibile</label>
+            <input type="number" id="st-qty" placeholder="Es. 50">
+          </div>
+          <div class="form-group">
+            <label>Prezzo Unitario (€)</label>
+            <input type="number" step="0.01" id="st-price" placeholder="Es. 12.50">
+          </div>
+          <button class="btn-primary" style="background:#d97706;" onclick="addStockItem()">Salva in Magazzino</button>
+
+          <hr style="margin: 25px 0; border:0; border-top:1px solid #eee;">
+
+          <h3 style="margin-top:0; font-size:16px; color:#10b981;">💰 Registra Spesa / Guadagno</h3>
+          <div class="form-group">
+            <label>Tipo Operazione</label>
+            <select id="fin-type">
+              <option value="Guadagno">Guadagno (Entrata)</option>
+              <option value="Spesa">Spesa (Uscita)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Descrizione Operazione</label>
+            <input type="text" id="fin-desc" placeholder="Es. Vendita libri / Acquisto materiale creativo">
+          </div>
+          <div class="form-group">
+            <label>Importo (€)</label>
+            <input type="number" step="0.01" id="fin-amount" placeholder="Es. 45.00">
+          </div>
+          <button class="btn-primary" style="background:#10b981;" onclick="addFinanceTransaction()">Registra Operazione</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Prodotti in Magazzino</h3>
+          <div class="posts-list" id="stock-container-list" style="margin-bottom:25px;"></div>
+
+          <h3 style="margin-top:0; font-size:16px;">Registro Spese e Guadagni</h3>
+          <div class="posts-list" id="finance-container-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agenda Social -->
+    <div id="sec-calendario" class="section">
+      <div class="top">
+        <h1>Agenda Post Social</h1>
+        <p>Il piano editoriale mensile per la programmazione.</p>
+      </div>
+
+      <div class="cal-banner">
+        <span class="cal-decor-left">🌸</span>
+        <div class="cal-logo">LOGO</div>
+        <div class="cal-title-main">Calendario social</div>
+        <div class="cal-title-sub" id="cal-month-year">MESE / ANNO</div>
+        <span class="cal-decor-right">🌿</span>
+      </div>
+
+      <div class="table-container">
+        <table class="cal-table">
+          <thead>
+            <tr>
+              <th style="width: 15%">Giorno / Ora</th>
+              <th style="width: 8%">Social</th>
+              <th style="width: 20%">Argomento</th>
+              <th style="width: 27%">Post</th>
+              <th style="width: 15%">Link</th>
+              <th style="width: 15%">Inviato / Flag</th>
+            </tr>
+          </thead>
+          <tbody id="cal-posts-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Statistiche -->
+    <div id="sec-statistiche" class="section">
+      <div class="top">
+        <h1>Statistiche Generali</h1>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>Copertura Social</h3><div class="value">12.4K</div></div>
+        <div class="card"><h3>Tasso Apertura Mail</h3><div class="value">42.8%</div></div>
+        <div class="card"><h3>Valore Magazzino Totale</h3><div class="value" id="stat-stock-value">€0.00</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let scheduledPosts = JSON.parse(localStorage.getItem('sp_posts')) || [];
+    let scheduledNewsletters = JSON.parse(localStorage.getItem('sp_newsletters')) || [];
+    let stockItems = JSON.parse(localStorage.getItem('sp_stock')) || [];
+    let financeItems = JSON.parse(localStorage.getItem('sp_finance')) || [];
+    let bookRecords = JSON.parse(localStorage.getItem('sp_books')) || [];
+
+    let currentMediaBase64 = '';
+    let currentMediaType = '';
+
+    window.onload = function() {
+      checkAuth();
+      renderPostsList();
+      renderNewslettersList();
+      renderStockList();
+      renderFinanceList();
+      renderBooksList();
+      updateDashboardCounts();
+    };
+
+    function checkAuth() {
+      const user = localStorage.getItem('sp_active_user');
+      if (user) {
+        document.getElementById('auth-screen').style.display = 'none';
+      } else {
+        document.getElementById('auth-screen').style.display = 'flex';
+      }
+    }
+
+    function login() {
+      const username = document.getElementById('login-username').value;
+      if (!username) { alert('Inserisci un nome utente!'); return; }
+      localStorage.setItem('sp_active_user', username);
+      checkAuth();
+    }
+
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.menu a').forEach(nav => nav.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav a').forEach(nav => nav.classList.remove('active'));
+
+      document.getElementById('sec-' + sectionId).classList.add('active');
+      
+      const desktopNav = document.getElementById('nav-' + sectionId);
+      const mobileNav = document.getElementById('mnav-' + sectionId);
+      
+      if (desktopNav) desktopNav.classList.add('active');
+      if (mobileNav) mobileNav.classList.add('active');
+    }
+
+    function updatePreview() {
+      const text = document.getElementById('post-text').value;
+      const platform = document.getElementById('channel-select').value;
+      document.getElementById('preview-content').innerText = text || 'Anteprima testo...';
+      document.getElementById('preview-platform').innerText = platform;
+    }
+
+    function previewMedia(event) {
+      const file = event.target.files[0];
+      const imgElement = document.getElementById('img-preview');
+      const videoElement = document.getElementById('video-preview');
+
+      imgElement.style.display = 'none';
+      videoElement.style.display = 'none';
+
+      if (file) {
+        const reader = new FileReader();
+        currentMediaType = file.type;
+
+        reader.onload = function(e) {
+          currentMediaBase64 = e.target.result;
+          if (file.type.startsWith('image/')) {
+            imgElement.src = currentMediaBase64;
+            imgElement.style.display = 'block';
+          } else if (file.type.startsWith('video/')) {
+            videoElement.src = currentMediaBase64;
+            videoElement.style.display = 'block';
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function generateAiText() {
+      const suggestions = [
+        "✨ Novità in arrivo! Restate sintonizzati! 🚀 #news #creativita",
+        "💡 Consiglio del giorno: La costanza è la chiave! 👇 #marketing",
+        "🎉 Buon inizio settimana! Quali sono i tuoi obiettivi? ☕ #motivation"
+      ];
+      const randomText = suggestions[Math.floor(Math.random() * suggestions.length)];
+      document.getElementById('post-text').value = randomText;
+      updatePreview();
+    }
+
+    function generateAiNewsletter() {
+      document.getElementById('nl-subject').value = "📬 Idee e ispirazioni speciali per te questo mese!";
+      document.getElementById('nl-body').value = "Ciao!\n\nIn questa nuova newsletter voglio condividerti i retroscena dei progetti a cui sto lavorando.\n\nEcco 3 consigli pratici per questa settimana:\n1. Organizza i tuoi contenuti in anticipo\n2. Dedica tempo alla creatività\n3. Ascolta sempre i pareri della tua community\n\nFammi sapere cosa ne pensi rispondendo a questa mail!\nUn caro saluto.";
+    }
+
+    function schedulePost() {
+      const platform = document.getElementById('channel-select').value;
+      const rawDate = document.getElementById('post-date').value;
+      const topic = document.getElementById('post-topic').value || '-';
+      const text = document.getElementById('post-text').value;
+      const link = document.getElementById('post-link').value || '-';
+
+      if (!text) { 
+        alert('Inserisci il testo del post!'); 
+        return; 
+      }
+
+      const newPost = {
+        id: Date.now(),
+        platform,
+        date: rawDate || '',
+        topic,
+        text,
+        link,
+        sent: false,
+        sentDate: ''
+      };
+
+      scheduledPosts.push(newPost);
+      localStorage.setItem('sp_posts', JSON.stringify(scheduledPosts));
+
+      renderPostsList();
+      updateDashboardCounts();
+
+      document.getElementById('post-date').value = '';
+      document.getElementById('post-topic').value = '';
+      document.getElementById('post-text').value = '';
+      document.getElementById('post-link').value = '';
+      document.getElementById('post-file').value = '';
+      document.getElementById('img-preview').style.display = 'none';
+      document.getElementById('video-preview').style.display = 'none';
+      currentMediaBase64 = ''; currentMediaType = '';
+      updatePreview();
+
+      alert('Post salvato in Agenda!');
+      showSection('calendario');
+    }
+
+    function scheduleNewsletter() {
+      const subject = document.getElementById('nl-subject').value;
+      const body = document.getElementById('nl-body').value;
+      const date = document.getElementById('nl-date').value;
+
+      if (!subject || !body || !date) { alert('Compila oggetto, testo e data della newsletter!'); return; }
+
+      const newNL = { id: Date.now(), subject, body, date };
+      scheduledNewsletters.push(newNL);
+      localStorage.setItem('sp_newsletters', JSON.stringify(scheduledNewsletters));
+
+      renderNewslettersList();
+      updateDashboardCounts();
+
+      document.getElementById('nl-subject').value = '';
+      document.getElementById('nl-body').value = '';
+      document.getElementById('nl-date').value = '';
+
+      alert('Newsletter programmata con successo!');
+    }
+
+    function toggleBookSaleFields() {
+      const saleType = document.getElementById('bk-sale-type').value;
+      const personFields = document.getElementById('bk-person-fields');
+      personFields.style.display = saleType === 'Persona' ? 'block' : 'none';
+    }
+
+    function addBookBuyRecord() {
+      const title = document.getElementById('bk-title').value;
+      const buyDate = document.getElementById('bk-buy-date').value;
+      const qty = parseInt(document.getElementById('bk-buy-qty').value);
+      const buyPrice = parseFloat(document.getElementById('bk-buy-price').value);
+
+      if (!title || !buyDate || isNaN(qty) || isNaN(buyPrice)) {
+        alert('Compila tutti i campi di acquisto del libro!');
+        return;
+      }
+
+      const newBook = {
+        id: Date.now(),
+        title,
+        buyDate,
+        qty,
+        buyPrice,
+        saleType: '',
+        salePrice: null,
+        saleDate: '',
+        clientName: ''
+      };
+
+      bookRecords.push(newBook);
+      localStorage.setItem('sp_books', JSON.stringify(bookRecords));
+
+      renderBooksList();
+      updateDashboardCounts();
+
+      document.getElementById('bk-title').value = '';
+      document.getElementById('bk-buy-date').value = '';
+      document.getElementById('bk-buy-qty').value = '1';
+      document.getElementById('bk-buy-price').value = '';
+
+      alert('Dati acquisto libro salvati!');
+    }
+
+    function addBookSaleRecord() {
+      const customTitle = document.getElementById('bk-custom-title').value;
+      const saleType = document.getElementById('bk-sale-type').value;
+      const salePrice = parseFloat(document.getElementById('bk-sale-price').value);
+      const saleDate = document.getElementById('bk-sale-date').value;
+      const clientName = document.getElementById('bk-client-name').value;
+
+      if (!customTitle) { alert('Inserisci il titolo del libro!'); return; }
+      if (isNaN(salePrice)) { alert('Inserisci il prezzo di vendita!'); return; }
+      if (saleType === 'Persona' && (!saleDate || !clientName)) {
+        alert('Inserisci data e nome cliente per la vendita di persona!');
+        return;
+      }
+
+      let book = bookRecords.find(b => b.title.toLowerCase() === customTitle.toLowerCase() && b.salePrice === null);
+
+      if (book) {
+        book.saleType = saleType;
+        book.salePrice = salePrice;
+        book.saleDate = saleDate;
+        book.clientName = clientName;
+      } else {
+        book = {
+          id: Date.now(),
+          title: customTitle,
+          buyDate: new Date().toISOString().split('T')[0],
+          qty: 1,
+          buyPrice: 0,
+          saleType,
+          salePrice,
+          saleDate,
+          clientName
+        };
+        bookRecords.push(book);
+      }
+
+      localStorage.setItem('sp_books', JSON.stringify(bookRecords));
+      renderBooksList();
+      updateDashboardCounts();
+
+      document.getElementById('bk-custom-title').value = '';
+      document.getElementById('bk-sale-price').value = '';
+      document.getElementById('bk-sale-date').value = '';
+      document.getElementById('bk-client-name').value = '';
+
+      alert('Vendita registrata con successo!');
+    }
+
+    function renderBooksList() {
+      const container = document.getElementById('books-container-list');
+      container.innerHTML = '';
+
+      if (bookRecords.length === 0) {
+        container.innerHTML = '<p style="color:#888; text-align:center;">Nessun libro registrato.</p>';
+        return;
+      }
+
+      bookRecords.forEach(bk => {
+        const div = document.createElement('div');
+        div.className = 'post-card-item book-item';
+
+        let saleText = '<em style="color:#888;">Non ancora venduto</em>';
+        let profitText = '';
+
+        const totalCost = (bk.qty * bk.buyPrice).toFixed(2);
+
+        if (bk.salePrice !== null) {
+          const totalRevenue = (bk.qty * bk.salePrice).toFixed(2);
+          const totalProfit = (totalRevenue - totalCost).toFixed(2);
+
+          if (bk.saleType === 'Amazon') {
+            saleText = `Venduto su <strong>Amazon</strong> a <strong>€${bk.salePrice.toFixed(2)}</strong>/pz (Tot. Ricavo: €${totalRevenue})`;
+          } else {
+            saleText = `Venduto di persona il <strong>${bk.saleDate}</strong> a <strong>${bk.clientName}</strong> per <strong>€${bk.salePrice.toFixed(2)}</strong>/pz (Tot. Ricavo: €${totalRevenue})`;
+          }
+
+          profitText = `<small style="color:${totalProfit >= 0 ? '#059669' : '#dc2626'}; font-weight:bold; display:block; margin-top:6px;">
+            Margine Totale Lotti: €${totalProfit}
+          </small>`;
+        }
+
+        div.innerHTML = `
+          <div class="post-card-info">
+            <span class="post-card-badge badge-book">Libro & Prezzi</span>
+            <div style="margin-top:6px; font-weight:bold; font-size:15px; color:#0f172a;">Libro: ${bk.title}</div>
+            <div style="margin-top:4px; color:#475569;">Acquistato/Stampato: <strong>${bk.qty} pz</strong> il <strong>${bk.buyDate}</strong> a <strong>€${bk.buyPrice.toFixed(2)}</strong>/pz (Tot. Costo: €${totalCost})</div>
+            <div style="margin-top:4px; color:#1e293b;">${saleText}</div>
+            ${profitText}
+          </div>
+          <button class="btn-delete-item" onclick="deleteBookRecord(${bk.id})">Elimina</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function deleteBookRecord(id) {
+      bookRecords = bookRecords.filter(b => b.id !== id);
+      localStorage.setItem('sp_books', JSON.stringify(bookRecords));
+      renderBooksList();
+      updateDashboardCounts();
+    }
+
+    function addStockItem() {
+      const name = document.getElementById('st-name').value;
+      const qty = parseInt(document.getElementById('st-qty').value);
+      const price = parseFloat(document.getElementById('st-price').value);
+
+      if (!name || isNaN(qty) || isNaN(price)) { alert('Compila tutti i campi del prodotto!'); return; }
+
+      const newItem = { id: Date.now(), name, qty, price };
+      stockItems.push(newItem);
+      localStorage.setItem('sp_stock', JSON.stringify(stockItems));
+
+      renderStockList();
+      updateDashboardCounts();
+
+      document.getElementById('st-name').value = '';
+      document.getElementById('st-qty').value = '';
+      document.getElementById('st-price').value = '';
+      alert('Prodotto aggiunto al magazzino!');
+    }
+
+    function renderStockList() {
+      const container = document.getElementById('stock-container-list');
+      container.innerHTML = '';
+
+      if (stockItems.length === 0) {
+        container.innerHTML = '<p style="color:#888; text-align:center;">Nessun articolo in magazzino.</p>';
+        return;
+      }
+
+      stockItems.forEach(item => {
+        const totalVal = (item.qty * item.price).toFixed(2);
+        const div = document.createElement('div');
+        div.className = 'post-card-item stock-item';
+        div.innerHTML = `
+          <div class="post-card-info">
+            <span class="post-card-badge badge-stock">Stock Magazzino</span>
+            <div style="margin-top:6px; font-weight:bold; font-size:14px; color:#0f172a;">${item.name}</div>
+            <div style="margin-top:4px; color:#475569;">Quantità: <strong>${item.qty} pz</strong> | Prezzo un.: <strong>€${item.price.toFixed(2)}</strong></div>
+            <small style="color:#64748b; display:block; margin-top:4px;">Valore Totale Stock: €${totalVal}</small>
+          </div>
+          <button class="btn-delete-item" onclick="deleteStockItem(${item.id})">Elimina</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function deleteStockItem(id) {
+      stockItems = stockItems.filter(i => i.id !== id);
+      localStorage.setItem('sp_stock', JSON.stringify(stockItems));
+      renderStockList();
+      updateDashboardCounts();
+    }
+
+    function addFinanceTransaction() {
+      const type = document.getElementById('fin-type').value;
+      const desc = document.getElementById('fin-desc').value;
+      const amount = parseFloat(document.getElementById('fin-amount').value);
+
+      if (!desc || isNaN(amount)) { alert('Inserisci descrizione e importo!'); return; }
+
+      const newFin = { id: Date.now(), type, desc, amount, date: new Date().toLocaleDateString('it-IT') };
+      financeItems.push(newFin);
+      localStorage.setItem('sp_finance', JSON.stringify(financeItems));
+
+      renderFinanceList();
+      updateDashboardCounts();
+
+      document.getElementById('fin-desc').value = '';
+      document.getElementById('fin-amount').value = '';
+      alert('Operazione registrata!');
+    }
+
+    function renderFinanceList() {
+      const container = document.getElementById('finance-container-list');
+      container.innerHTML = '';
+
+      if (financeItems.length === 0) {
+        container.innerHTML = '<p style="color:#888; text-align:center;">Nessuna spesa o guadagno registrato.</p>';
+        return;
+      }
+
+      financeItems.forEach(item => {
+        const div = document.createElement('div');
+        const isIncome = item.type === 'Guadagno';
+        div.className = `post-card-item ${isIncome ? 'income-item' : 'expense-item'}`;
+        div.innerHTML = `
+          <div class="post-card-info">
+            <span class="post-card-badge ${isIncome ? 'badge-inc' : 'badge-exp'}">${item.type}</span>
+            <div style="margin-top:6px; font-weight:bold; font-size:14px; color:#0f172a;">${item.desc}</div>
+            <div style="margin-top:4px; font-weight:bold; font-size:15px; color:${isIncome ? '#059669' : '#dc2626'};">
+              ${isIncome ? '+' : '-'} €${item.amount.toFixed(2)}
+            </div>
+            <small style="color:#64748b; display:block; margin-top:4px;">Data: ${item.date}</small>
+          </div>
+          <button class="btn-delete-item" onclick="deleteFinanceItem(${item.id})">Elimina</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function deleteFinanceItem(id) {
+      financeItems = financeItems.filter(i => i.id !== id);
+      localStorage.setItem('sp_finance', JSON.stringify(financeItems));
+      renderFinanceList();
+      updateDashboardCounts();
+    }
+
+    function renderPostsList() {
+      const tbody = document.getElementById('cal-posts-body');
+      tbody.innerHTML = '';
+
+      let labelMonthYear = "MESE / ANNO";
+      if (scheduledPosts.length > 0 && scheduledPosts[0].date) {
+        const d = new Date(scheduledPosts[0].date);
+        if (!isNaN(d)) {
+          const opt = { month: 'long', year: 'numeric' };
+          labelMonthYear = d.toLocaleDateString('it-IT', opt).toUpperCase();
+        }
+      }
+      document.getElementById('cal-month-year').innerText = labelMonthYear;
+
+      if (scheduledPosts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888; padding: 20px;">Nessun post pianificato in calendario.</td></tr>`;
+        return;
+      }
+
+      scheduledPosts.forEach(post => {
+        const tr = document.createElement('tr');
+
+        let dayTimeStr = 'Da programmare';
+        if (post.date) {
+          const d = new Date(post.date);
+          if (!isNaN(d.getTime())) {
+            const dayName = d.toLocaleDateString('it-IT', { day: '2-digit', month: 'long' });
+            const hourName = d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+            dayTimeStr = `<strong>${dayName}</strong><br><span style="color:#64748b; font-size:11px;">${hourName}</span>`;
+          } else {
+            dayTimeStr = `<strong>${post.date.replace('T', ' ')}</strong>`;
+          }
+        }
+
+        let socialBadge = '';
+        if (post.platform === 'Facebook') socialBadge = '<span class="cal-social-icon facebook">f</span>';
+        else if (post.platform === 'Instagram') socialBadge = '<span class="cal-social-icon instagram">📷</span>';
+        else if (post.platform === 'LinkedIn') socialBadge = '<span class="cal-social-icon linkedin">in</span>';
+        else socialBadge = `<span class="post-card-badge">${post.platform}</span>`;
+
+        let linkContent = (post.link === '-' || !post.link) ? '-' : `<a href="https://${post.link.replace(/^(https?:\/\/)?/, '')}" target="_blank" style="color: #0d9488; font-weight: 500; text-decoration: underline;">Apri link</a>`;
+
+        const isChecked = post.sent ? 'checked' : '';
+        const timestampHtml = post.sentDate ? `<span class="date-badge">⏱️ ${post.sentDate}</span>` : '';
+
+        tr.innerHTML = `
+          <td>${dayTimeStr}</td>
+          <td>${socialBadge}</td>
+          <td style="text-align:left; font-weight: 500;">${post.topic || '-'}</td>
+          <td style="text-align:left; font-style: italic; max-width: 300px;">${post.text}</td>
+          <td>${linkContent}</td>
+          <td>
+            <div style="display: inline-flex; flex-direction: column; align-items: center;">
+              <input type="checkbox" class="cal-checkbox" ${isChecked} onchange="togglePostSent(${post.id}, this)">
+              ${timestampHtml}
+            </div>
+            <button class="btn-delete-item" style="margin-top:10px; font-size:9px; padding:3px 6px;" onclick="deletePost(${post.id})">Elimina</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function togglePostSent(id, checkbox) {
+      const post = scheduledPosts.find(p => p.id === id);
+      if (post) {
+        post.sent = checkbox.checked;
+        if (checkbox.checked) {
+          const now = new Date();
+          const timestamp = now.toLocaleDateString('it-IT') + ' ' + now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+          post.sentDate = timestamp;
+        } else {
+          post.sentDate = '';
+        }
+        localStorage.setItem('sp_posts', JSON.stringify(scheduledPosts));
+        renderPostsList();
+      }
+    }
+
+    function renderNewslettersList() {
+      const container = document.getElementById('newsletter-container-list');
+      container.innerHTML = '';
+
+      if (scheduledNewsletters.length === 0) {
+        container.innerHTML = '<p style="color:#888; text-align:center;">Nessuna newsletter in programma.</p>';
+        return;
+      }
+
+      scheduledNewsletters.forEach(nl => {
+        const item = document.createElement('div');
+        item.className = 'post-card-item newsletter-item';
+        item.innerHTML = `
+          <div class="post-card-info">
+            <span class="post-card-badge badge-nl">E-mail Newsletter</span>
+            <div style="margin-top:6px; font-weight:bold; font-size:14px; color:#0f172a;">${nl.subject}</div>
+            <div class="nl-body-preview">${nl.body}</div>
+            <small style="color:#64748b; display:block; margin-top:6px;">Invio previsto: ${nl.date.replace('T', ' ')}</small>
+          </div>
+          <button class="btn-delete-item" onclick="deleteNewsletter(${nl.id})">Elimina</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function deletePost(id) {
+      scheduledPosts = scheduledPosts.filter(p => p.id !== id);
+      localStorage.setItem('sp_posts', JSON.stringify(scheduledPosts));
+      renderPostsList();
+      updateDashboardCounts();
+    }
+
+    function deleteNewsletter(id) {
+      scheduledNewsletters = scheduledNewsletters.filter(nl => nl.id !== id);
+      localStorage.setItem('sp_newsletters', JSON.stringify(scheduledNewsletters));
+      renderNewslettersList();
+      updateDashboardCounts();
+    }
+
+    function updateDashboardCounts() {
+      document.getElementById('count-scheduled').innerText = scheduledPosts.length;
+      document.getElementById('count-newsletters').innerText = scheduledNewsletters.length;
+      document.getElementById('count-books-total').innerText = bookRecords.length;
+
+      let totalStockQty = 0;
+      let totalStockVal = 0;
+      stockItems.forEach(i => {
+        totalStockQty += i.qty;
+        totalStockVal += (i.qty * i.price);
+      });
+      document.getElementById('stat-stock-value').innerText = '€' + totalStockVal.toFixed(2);
+
+      let totalIncome = 0;
+      let totalExpense = 0;
+
+      financeItems.forEach(f => {
+        if (f.type === 'Guadagno') totalIncome += f.amount;
+        else totalExpense += f.amount;
+      });
+
+      bookRecords.forEach(b => {
+        totalExpense += (b.qty * b.buyPrice);
+        if (b.salePrice !== null) totalIncome += (b.qty * b.salePrice);
+      });
+
+      const net = totalIncome - totalExpense;
+      const profitElem = document.getElementById('count-profit-net');
+      profitElem.innerText = '€' + net.toFixed(2);
+      profitElem.style.color = net >= 0 ? '#10b981' : '#ef4444';
+    }
+
+    /* ESPORTAZIONE DATI IN FORMATO .XLSX NATIVO CON SHEETJS */
+    function exportToExcel() {
+      if (typeof XLSX === 'undefined') {
+        alert('Caricamento della libreria Excel in corso, riprova tra qualche istante.');
+        return;
+      }
+
+      const workbook = XLSX.utils.book_new();
+
+      // 1. Post Social
+      const socialData = scheduledPosts.map(p => ({
+        "Giorno/Ora": p.date ? p.date.replace('T', ' ') : '',
+        "Canale Social": p.platform || '',
+        "Argomento": p.topic || '',
+        "Testo Post": p.text || '',
+        "Link": p.link || '',
+        "Stato Invio": p.sent ? `Sì (${p.sentDate})` : 'No'
+      }));
+      const wsSocial = XLSX.utils.json_to_sheet(socialData.length ? socialData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsSocial, "Agenda Social");
+
+      // 2. Newsletter
+      const nlData = scheduledNewsletters.map(n => ({
+        "Data Invio": n.date ? n.date.replace('T', ' ') : '',
+        "Oggetto": n.subject || '',
+        "Testo Body": n.body || ''
+      }));
+      const wsNl = XLSX.utils.json_to_sheet(nlData.length ? nlData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsNl, "Newsletter");
+
+      // 3. Libri & Vendite
+      const bookData = bookRecords.map(b => ({
+        "Titolo Libro": b.title || '',
+        "Data Acquisto": b.buyDate || '',
+        "Quantità": b.qty || 0,
+        "Costo Acquisto Unitario (€)": b.buyPrice || 0,
+        "Tipo Vendita": b.saleType || '',
+        "Prezzo Vendita Unitario (€)": b.salePrice ?? '',
+        "Data Vendita": b.saleDate || '',
+        "Cliente": b.clientName || ''
+      }));
+      const wsBooks = XLSX.utils.json_to_sheet(bookData.length ? bookData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsBooks, "Libri & Vendite");
+
+      // 4. Magazzino (Stock)
+      const stockData = stockItems.map(s => ({
+        "Prodotto": s.name || '',
+        "Quantità": s.qty || 0,
+        "Prezzo Unitario (€)": s.price || 0,
+        "Valore Totale (€)": (s.qty * s.price).toFixed(2)
+      }));
+      const wsStock = XLSX.utils.json_to_sheet(stockData.length ? stockData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsStock, "Magazzino Stock");
+
+      // 5. Spese e Guadagni
+      const financeData = financeItems.map(f => ({
+        "Data": f.date || '',
+        "Tipo Operazione": f.type || '',
+        "Descrizione": f.desc || '',
+        "Importo (€)": f.amount || 0
+      }));
+      const wsFinance = XLSX.utils.json_to_sheet(financeData.length ? financeData : [{}]);
+      XLSX.utils.book_append_sheet(workbook, wsFinance, "Spese e Guadagni");
+
+      // Download del file .xlsx
+      XLSX.writeFile(workbook, "Planner_Pro_Dati_Completi.xlsx");
+    }
+  </script>
 
 </body>
 </html>
