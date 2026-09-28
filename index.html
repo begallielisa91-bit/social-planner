@@ -2,76 +2,1171 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu di Navigazione</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Social, Email & Business Planner Pro</title>
+
+  <!-- Libreria SheetJS per l'esportazione nativa in formato .xlsx -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  
+  <!-- Libreria EmailJS per l'invio sicuro dei dati via email -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
   <style>
-    /* Stili base del menu */
-    nav {
-      background-color: #333;
-      font-family: Arial, sans-serif;
-    }
-
-    nav ul {
-      list-style-type: none;
+    * { box-sizing: border-box; }
+    body {
       margin: 0;
-      padding: 0;
-      display: flex;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f5f7fb;
+      color: #25283d;
+      padding-bottom: 75px;
     }
 
-    nav li {
-      position: relative;
+    #auth-screen {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #f5f7fb; display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 20px;
+    }
+    .auth-box {
+      background: white; padding: 30px 20px; border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 380px; text-align: center;
+    }
+    .auth-box h2 { margin-top: 0; color: #6c63ff; margin-bottom: 20px; }
+    .auth-box input {
+      width: 100%; padding: 12px; margin-bottom: 15px;
+      border: 1px solid #e0e0e0; border-radius: 8px; font-size: 15px; outline: none;
     }
 
-    nav a {
-      display: block;
-      color: white;
-      text-decoration: none;
-      padding: 14px 20px;
+    .sidebar {
+      position: fixed; left: 0; top: 0; width: 250px; height: 100vh;
+      background: #ffffff; padding: 25px 15px; box-shadow: 3px 0 15px rgba(0,0,0,0.06);
+      z-index: 100; display: flex; flex-direction: column; justify-content: space-between;
     }
-
-    nav a:hover {
-      background-color: #555;
+    .logo { font-size: 20px; font-weight: bold; margin-bottom: 25px; color: #6c63ff; }
+    .menu a {
+      display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+      margin-bottom: 6px; border-radius: 10px; color: #555566; font-size: 15px;
+      font-weight: 500; cursor: pointer; text-decoration: none;
     }
+    .menu a.active { background: #eeeaff; color: #6c63ff; font-weight: 600; }
 
-    /* Gestione menu a tendina */
-    .dropdown-menu {
+    .mobile-nav {
       display: none;
-      position: absolute;
-      top: 100%;
+      position: fixed;
+      bottom: 0;
       left: 0;
-      background-color: #444;
-      min-width: 160px;
-      flex-direction: column;
-      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-      z-index: 1000;
+      width: 100%;
+      background: #ffffff;
+      border-top: 1px solid #e5e7eb;
+      padding: 8px 0;
+      z-index: 200;
+      justify-content: space-around;
+      align-items: center;
     }
-
-    .dropdown-menu a {
-      padding: 12px 16px;
-    }
-
-    /* Mostra il sub-menu al passaggio del mouse */
-    .dropdown:hover .dropdown-menu {
+    .mobile-nav a {
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      font-size: 11px;
+      color: #6b7280;
+      text-decoration: none;
+      cursor: pointer;
+      text-align: center;
+    }
+    .mobile-nav a.active {
+      color: #6c63ff;
+      font-weight: bold;
+    }
+    .mobile-nav span {
+      font-size: 20px;
+      margin-bottom: 2px;
+      display: block;
+    }
+
+    .main { margin-left: 250px; padding: 30px; }
+    .top h1 { margin: 0 0 8px; font-size: 24px; }
+    .top p { margin: 0 0 20px; color: #777788; font-size: 14px; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .card h3 { margin: 0 0 8px; font-size: 12px; color: #888899; text-transform: uppercase; }
+    .card .value { font-size: 22px; font-weight: bold; }
+
+    .home-export-card {
+      background: white; padding: 20px; border-radius: 12px; margin-top: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: space-between; gap: 15px;
+    }
+
+    .editor-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+    .form-box, .preview-box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+    .form-group select, .form-group textarea, .form-group input {
+      width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px;
+    }
+    .form-group textarea { height: 90px; }
+
+    .btn-tools { display: flex; gap: 10px; margin-bottom: 15px; }
+    .btn-ai, .btn-canva {
+      border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 600;
+      cursor: pointer; text-decoration: none; text-align: center; flex: 1;
+    }
+    .btn-ai { background: #6c63ff; color: #ffffff !important; }
+    .btn-canva { background: #00c4cc; color: #ffffff !important; }
+    .btn-primary {
+      background: #6c63ff; color: #ffffff !important; border: none; padding: 12px;
+      border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
+    }
+
+    .preview-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .preview-avatar { width: 36px; height: 36px; border-radius: 50%; background: #6c63ff; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .preview-text { font-size: 13px; line-height: 1.4; white-space: pre-wrap; min-height: 50px; }
+    .preview-media { width: 100%; border-radius: 8px; margin-top: 10px; display: none; max-height: 220px; object-fit: cover; }
+
+    .posts-list { display: flex; flex-direction: column; gap: 12px; }
+    .post-card-item {
+      background: white; padding: 15px; border-radius: 12px; border-left: 5px solid #6c63ff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    }
+    .post-card-item.newsletter-item { border-left-color: #0284c7; }
+    .post-card-item.income-item { border-left-color: #10b981; }
+    .post-card-item.expense-item { border-left-color: #ef4444; }
+    .post-card-item.stock-item { border-left-color: #f59e0b; }
+    .post-card-item.book-item { border-left-color: #8b5cf6; }
+
+    .post-card-info { font-size: 13px; flex: 1; }
+    
+    .post-card-badge {
+      background: #4c1d95; color: #ffffff !important; font-weight: bold; padding: 5px 10px; border-radius: 6px; font-size: 12px; display: inline-block;
+    }
+    .post-card-badge.badge-nl { background: #0369a1; color: #ffffff !important; }
+    .post-card-badge.badge-inc { background: #059669; color: #ffffff !important; }
+    .post-card-badge.badge-exp { background: #dc2626; color: #ffffff !important; }
+    .post-card-badge.badge-stock { background: #d97706; color: #ffffff !important; }
+    .post-card-badge.badge-book { background: #7c3aed; color: #ffffff !important; }
+
+    .nl-body-preview {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-top: 8px;
+      font-size: 13px; color: #1e293b; line-height: 1.4; white-space: pre-wrap; word-break: break-word;
+    }
+
+    .form-section-title {
+      font-size: 14px; font-weight: bold; color: #7c3aed; margin-bottom: 10px; border-bottom: 2px solid #f3e8ff; padding-bottom: 4px;
+    }
+
+    .btn-delete-item { background: #ff4d4f; color: #ffffff !important; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; flex-shrink: 0; }
+
+    .cal-banner {
+      background: linear-gradient(135deg, #0f766e, #0d9488);
+      color: white; padding: 25px 20px; border-radius: 16px 16px 0 0; text-align: center;
+      position: relative; overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .cal-decor-left, .cal-decor-right { position: absolute; top: 10px; font-size: 26px; }
+    .cal-decor-left { left: 20px; }
+    .cal-decor-right { right: 20px; }
+    .cal-logo { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; margin-bottom: 4px; }
+    .cal-title-main { font-family: 'Georgia', serif; font-size: 22px; font-weight: bold; margin: 4px 0; }
+    .cal-title-sub { font-family: 'Georgia', serif; font-size: 32px; letter-spacing: 3px; font-weight: bold; text-transform: uppercase; }
+
+    .table-container {
+      background: #ffffff; border-radius: 0 0 16px 16px; overflow-x: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; border-top: none;
+    }
+    .cal-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    .cal-table th {
+      background: #115e59; color: #ffffff; text-align: center; font-weight: 600;
+      font-size: 14px; padding: 14px 10px; border: 1px solid #0d9488;
+    }
+    .cal-table td {
+      padding: 14px 10px; border: 1px solid #2dd4bf; text-align: center; font-size: 13px; color: #1e293b;
+      vertical-align: middle; word-break: break-word;
+    }
+    .cal-table tr:nth-child(even) { background: #f0fdfa; }
+
+    .cal-social-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 6px; font-weight: bold; color: white; font-size: 14px;
+    }
+    .cal-social-icon.facebook { background: #1877f2; }
+    .cal-social-icon.instagram { background: #e1306c; }
+    .cal-social-icon.linkedin { background: #0077b5; }
+
+    .cal-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: #0d9488; }
+    .date-badge { display: block; font-size: 11px; color: #0d9488; font-weight: bold; margin-top: 4px; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .mobile-nav { display: flex; }
+      .main { margin-left: 0; padding: 20px 15px; }
+      .editor-container { grid-template-columns: 1fr; }
+      .home-export-card { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
 
-  <nav>
-    <ul>
-      <li><a href="#home">Home</a></li>
-      <li><a href="#about">Chi Siamo</a></li>
-      <li class="dropdown">
-        <a href="#post">Post &#9662;</a>
-        <ul class="dropdown-menu">
-          <li><a href="#facebook">Facebook</a></li>
-          <li><a href="#instagram">Instagram</a></li>
-        </ul>
-      </li>
-      <li><a href="#contatti">Contatti</a></li>
-    </ul>
-  </nav>
+  <!-- Login con Email -->
+  <div id="auth-screen">
+    <div class="auth-box">
+      <h2>🚀 Planner Pro</h2>
+      <p style="color:#666; font-size:13px; margin-bottom:15px;">Accedi inserendo la tua email per salvare ed inviare i documenti</p>
+      <input type="text" id="login-username" placeholder="Nome utente">
+      <input type="email" id="login-email" placeholder="La tua email (es. nome@email.it)">
+      <input type="password" id="login-password" placeholder="Password">
+      <button class="btn-primary" onclick="login()">Accedi</button>
+    </div>
+  </div>
 
+  <!-- Sidebar Desktop -->
+  <div class="sidebar">
+    <div>
+      <div class="logo">🚀 Planner Pro</div>
+      <div class="menu">
+        <a onclick="showSection('dashboard')" id="nav-dashboard" class="active">🏠 Dashboard</a>
+        <a onclick="showSection('calendario')" id="nav-calendario">📅 Agenda Social</a>
+        <a onclick="showSection('crea-post')" id="nav-crea-post">✍️ Crea post</a>
+        <a onclick="showSection('newsletter')" id="nav-newsletter">📧 Newsletter</a>
+        <a onclick="showSection('libri')" id="nav-libri">🏷️ Prezzi Libri</a>
+        <a onclick="showSection('magazzino')" id="nav-magazzino">📦 Magazzino & Finanze</a>
+        <a onclick="showSection('statistiche')" id="nav-statistiche">📊 Statistiche</a>
+      </div>
+      
+      <button class="btn-primary" style="background:#0284c7; margin-top: 15px;" onclick="sendDataToEmail()">
+        ✉️ Invia Dati alla mia Email
+      </button>
+
+      <button class="btn-primary" style="background:#10b981; margin-top: 8px;" onclick="exportToExcel()">
+        📥 Scarica Excel (.xlsx)
+      </button>
+    </div>
+    <div style="font-size:11px; color:#888; text-align:center;">
+      Utente: <strong id="user-display">-</strong>
+    </div>
+  </div>
+
+  <!-- Navigation Bar Mobile -->
+  <div class="mobile-nav">
+    <a onclick="showSection('dashboard')" id="mnav-dashboard" class="active">
+      <span>🏠</span> Home
+    </a>
+    <a onclick="showSection('calendario')" id="mnav-calendario">
+      <span>📅</span> Social
+    </a>
+    <a onclick="showSection('crea-post')" id="mnav-crea-post">
+      <span>✍️</span> Post
+    </a>
+    <a onclick="showSection('libri')" id="mnav-libri">
+      <span>🏷️</span> Prezzi
+    </a>
+    <a onclick="showSection('magazzino')" id="mnav-magazzino">
+      <span>📦</span> Stock
+    </a>
+  </div>
+
+  <!-- Contenuto Principale -->
+  <div class="main">
+
+    <!-- Dashboard (HOME) -->
+    <div id="sec-dashboard" class="section active">
+      <div class="top">
+        <h1>Dashboard</h1>
+        <p>Panoramica dei tuoi contenuti e attività per <strong id="dash-user-email"></strong>.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Post Programmati</h3>
+          <div class="value" id="count-scheduled">0</div>
+        </div>
+        <div class="card">
+          <h3>Newsletter</h3>
+          <div class="value" id="count-newsletters">0</div>
+        </div>
+        <div class="card">
+          <h3>Libri Registrati</h3>
+          <div class="value" id="count-books-total">0</div>
+        </div>
+        <div class="card">
+          <h3>Profitto Netto</h3>
+          <div class="value" id="count-profit-net" style="color:#10b981;">€0.00</div>
+        </div>
+      </div>
+
+      <!-- BOX DOWNLOAD & INVIO EMAIL IN HOME PAGE -->
+      <div class="home-export-card">
+        <div>
+          <h3 style="margin: 0 0 6px 0; font-size: 16px; color: #1e293b;">📊 Salva & Invia Documenti</h3>
+          <p style="margin: 0; color: #64748b; font-size: 13px;">Ricevi un report completo dei tuoi dati inviandolo alla tua email o scaricando il file Excel.</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-primary" style="background:#0284c7; width: auto; padding: 12px 20px;" onclick="sendDataToEmail()">
+            ✉️ Invia alla mia Email
+          </button>
+          <button class="btn-primary" style="background:#10b981; width: auto; padding: 12px 20px;" onclick="exportToExcel()">
+            📥 Scarica Excel (.xlsx)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agenda Social -->
+    <div id="sec-calendario" class="section">
+      <div class="top">
+        <h1>📅 Agenda Social</h1>
+        <p>Prospetto e stato di pubblicazione dei contenuti social.</p>
+      </div>
+
+      <div class="cal-banner">
+        <div class="cal-decor-left">✨</div>
+        <div class="cal-logo">PLANNER PRO</div>
+        <div class="cal-title-main">AGENDA</div>
+        <div class="cal-title-sub">SOCIAL</div>
+        <div class="cal-decor-right">✨</div>
+      </div>
+
+      <div class="table-container">
+        <table class="cal-table">
+          <thead>
+            <tr>
+              <th>PUBBLICATO</th>
+              <th>CANALE</th>
+              <th>DATA / ORA</th>
+              <th>ARGOMENTO / TOPIC</th>
+              <th>TESTO POST / COPY</th>
+              <th>MEDIA / LINK</th>
+              <th>AZIONI</th>
+            </tr>
+          </thead>
+          <tbody id="calendar-table-body">
+            <!-- Popolato via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Crea Post Social -->
+    <div id="sec-crea-post" class="section">
+      <div class="top">
+        <h1>Crea Post Social</h1>
+      </div>
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-group">
+            <label>Canale Social</label>
+            <select id="channel-select" onchange="updatePreview()">
+              <option value="Instagram">Instagram</option>
+              <option value="Facebook">Facebook</option>
+              <option value="LinkedIn">LinkedIn</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Data e Ora di Pubblicazione</label>
+            <input type="datetime-local" id="post-date">
+          </div>
+
+          <div class="form-group">
+            <label>Argomento (Topic)</label>
+            <input type="text" id="post-topic" placeholder="Es. Nuovi arrivi in libreria o Promo fine mese">
+          </div>
+
+          <div class="btn-tools">
+            <button class="btn-ai" onclick="generateAiText()">✨ Testo AI</button>
+            <a class="btn-canva" href="https://www.canva.com" target="_blank">🎨 Canva</a>
+          </div>
+
+          <div class="form-group">
+            <label>Post (Testo / Copy)</label>
+            <textarea id="post-text" placeholder="Scrivi il testo del post..." oninput="updatePreview()"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Link / URL</label>
+            <input type="text" id="post-link" placeholder="Es. www.amazon.it/libro o articolo di blog">
+          </div>
+
+          <div class="form-group">
+            <label>Foto o Video</label>
+            <input type="file" id="post-file" accept="image/*,video/*" onchange="previewMedia(event)">
+          </div>
+
+          <button class="btn-primary" onclick="schedulePost()">Salva e Programma Post</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Anteprima</h3>
+          <div class="preview-box">
+            <div class="preview-header">
+              <div class="preview-avatar">SP</div>
+              <div>
+                <strong>Brand</strong><br>
+                <small id="preview-platform" style="color:#777;">Instagram</small>
+              </div>
+            </div>
+            <div class="preview-text" id="preview-content">Anteprima testo...</div>
+            <img id="img-preview" class="preview-media" alt="Anteprima Immagine">
+            <video id="video-preview" class="preview-media" controls></video>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Newsletter -->
+    <div id="sec-newsletter" class="section">
+      <div class="top">
+        <h1>Pianifica Newsletter</h1>
+        <p>Crea e organizza le tue e-mail per gli iscritti.</p>
+      </div>
+
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-group">
+            <label>Oggetto della Mail</label>
+            <input type="text" id="nl-subject" placeholder="Es. 📬 Novità del mese + regalo speciale!">
+          </div>
+
+          <div class="btn-tools">
+            <button class="btn-ai" onclick="generateAiNewsletter()">✨ Bozza AI Newsletter</button>
+          </div>
+
+          <div class="form-group">
+            <label>Contenuto E-mail</label>
+            <textarea id="nl-body" placeholder="Scrivi qui il testo della mail..." style="height:140px;"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Data e Ora di Invio</label>
+            <input type="datetime-local" id="nl-date">
+          </div>
+
+          <button class="btn-primary" style="background:#0284c7;" onclick="scheduleNewsletter()">Programma Newsletter</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Newsletter Pianificate</h3>
+          <div class="posts-list" id="newsletter-container-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prezzi & Vendite Libri -->
+    <div id="sec-libri" class="section">
+      <div class="top">
+        <h1>🏷️ Prezzi & Vendite Libri</h1>
+        <p>Registra e monitora acquisti e vendite dei tuoi libri.</p>
+      </div>
+
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-section-title">1. Dati Libro & Acquisto</div>
+          <div class="form-group">
+            <label>Titolo del Libro</label>
+            <input type="text" id="bk-title" placeholder="Es. I colori di casa delle filastrocche">
+          </div>
+
+          <div class="form-group">
+            <label>Data di Acquisto / Stampa</label>
+            <input type="date" id="bk-buy-date">
+          </div>
+
+          <div class="form-group">
+            <label>Quantità Acquistata / Stampata</label>
+            <input type="number" id="bk-buy-qty" placeholder="Es. 20" value="1">
+          </div>
+
+          <div class="form-group">
+            <label>Costo di Acquisto Unitario (€)</label>
+            <input type="number" step="0.01" id="bk-buy-price" placeholder="Es. 4.50">
+          </div>
+
+          <button class="btn-primary" style="background:#6c63ff; margin-bottom: 25px;" onclick="addBookBuyRecord()">Salva Dati Libro di Acquisto</button>
+
+          <div class="form-section-title">2. Canale di Vendita</div>
+          
+          <div class="form-group">
+            <label>Titolo del Libro Venduto</label>
+            <input type="text" id="bk-custom-title" placeholder="Es. I colori di casa delle filastrocche">
+          </div>
+
+          <div class="form-group">
+            <label>Seleziona Canale</label>
+            <select id="bk-sale-type" onchange="toggleBookSaleFields()">
+              <option value="Amazon">Venduto su Amazon</option>
+              <option value="Persona">Venduto di Persona</option>
+            </select>
+          </div>
+
+          <div id="bk-person-fields" style="display:none; background:#f8fafc; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #e2e8f0;">
+            <div class="form-group">
+              <label>Data di Vendita</label>
+              <input type="date" id="bk-sale-date">
+            </div>
+            <div class="form-group">
+              <label>Nome del Cliente</label>
+              <input type="text" id="bk-client-name" placeholder="Es. Maria Rossi">
+            </div>
+            <div class="form-group">
+              <label>Quantità Venduta</label>
+              <input type="number" id="bk-sale-qty" value="1">
+            </div>
+            <div class="form-group">
+              <label>Prezzo di Vendita Unitario (€)</label>
+              <input type="number" step="0.01" id="bk-sale-price" placeholder="Es. 12.00">
+            </div>
+          </div>
+
+          <button class="btn-primary" style="background:#7c3aed;" onclick="addBookSaleRecord()">Registra Vendita</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Registro Libri & Vendite</h3>
+          <div class="posts-list" id="books-container-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Magazzino & Finanze -->
+    <div id="sec-magazzino" class="section">
+      <div class="top">
+        <h1>📦 Magazzino & Finanze</h1>
+        <p>Gestione delle giacenze di magazzino, entrate e uscite finanziarie.</p>
+      </div>
+
+      <div class="editor-container">
+        <div class="form-box">
+          <div class="form-section-title">1. Movimento Finanziario</div>
+          <div class="form-group">
+            <label>Tipo Movimento</label>
+            <select id="fin-type">
+              <option value="Entrata">Entrata (+)</option>
+              <option value="Uscita">Uscita (-)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Descrizione</label>
+            <input type="text" id="fin-desc" placeholder="Es. Vendita diretta, Acquisto cancelleria...">
+          </div>
+          <div class="form-group">
+            <label>Importo (€)</label>
+            <input type="number" step="0.01" id="fin-amount" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>Data Movimento</label>
+            <input type="date" id="fin-date">
+          </div>
+          <button class="btn-primary" style="background:#10b981; margin-bottom:25px;" onclick="addFinancialRecord()">Registra Movimento</button>
+
+          <div class="form-section-title">2. Articolo in Magazzino</div>
+          <div class="form-group">
+            <label>Nome Articolo / Prodotto</label>
+            <input type="text" id="stk-item" placeholder="Es. Segnalibri, Gadget, Materiale promo">
+          </div>
+          <div class="form-group">
+            <label>Quantità</label>
+            <input type="number" id="stk-qty" placeholder="Es. 50">
+          </div>
+          <div class="form-group">
+            <label>Valore Stimato Unitario (€)</label>
+            <input type="number" step="0.01" id="stk-val" placeholder="Es. 1.50">
+          </div>
+          <button class="btn-primary" style="background:#f59e0b;" onclick="addStockRecord()">Aggiungi a Magazzino</button>
+        </div>
+
+        <div>
+          <h3 style="margin-top:0; font-size:16px;">Registro Finanze & Stock</h3>
+          <div class="posts-list" id="finance-stock-container-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiche -->
+    <div id="sec-statistiche" class="section">
+      <div class="top">
+        <h1>📊 Statistiche & Report</h1>
+        <p>Riepilogo analitico dell'attività registrata nel planner.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Totale Post Social</h3>
+          <div class="value" id="stat-posts">0</div>
+        </div>
+        <div class="card">
+          <h3>Totale Email Inviate/Programmate</h3>
+          <div class="value" id="stat-emails">0</div>
+        </div>
+        <div class="card">
+          <h3>Entrate Totali</h3>
+          <div class="value" id="stat-income" style="color:#10b981;">€0.00</div>
+        </div>
+        <div class="card">
+          <h3>Uscite Totali</h3>
+          <div class="value" id="stat-expenses" style="color:#ef4444;">€0.00</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Inizializzazione dati di stato salvati nel browser
+    let state = {
+      user: { name: '', email: '' },
+      posts: JSON.parse(localStorage.getItem('planner_posts')) || [],
+      newsletters: JSON.parse(localStorage.getItem('planner_newsletters')) || [],
+      books: JSON.parse(localStorage.getItem('planner_books')) || [],
+      finance: JSON.parse(localStorage.getItem('planner_finance')) || [],
+      stock: JSON.parse(localStorage.getItem('planner_stock')) || []
+    };
+
+    let mediaBase64 = null;
+
+    // EmailJS Setup (sostituire con le proprie chiavi se necessario)
+    (function(){
+      if (window.emailjs) {
+        emailjs.init("YOUR_PUBLIC_KEY");
+      }
+    })();
+
+    // Autenticazione & Navigazione
+    function login() {
+      const u = document.getElementById('login-username').value;
+      const e = document.getElementById('login-email').value;
+      if (!u || !e) {
+        alert('Compila nome utente ed email per accedere.');
+        return;
+      }
+      state.user.name = u;
+      state.user.email = e;
+      document.getElementById('user-display').innerText = u;
+      document.getElementById('dash-user-email').innerText = e;
+      document.getElementById('auth-screen').style.display = 'none';
+      renderAll();
+    }
+
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.menu a, .mobile-nav a').forEach(a => a.classList.remove('active'));
+
+      const sec = document.getElementById('sec-' + id);
+      if (sec) sec.classList.add('active');
+
+      const navEl = document.getElementById('nav-' + id);
+      if (navEl) navEl.classList.add('active');
+
+      const mNavEl = document.getElementById('mnav-' + id);
+      if (mNavEl) mNavEl.classList.add('active');
+    }
+
+    // Gestione Immagini/Video
+    function previewMedia(event) {
+      const file = event.target.files[0];
+      const imgPrev = document.getElementById('img-preview');
+      const vidPrev = document.getElementById('video-preview');
+      
+      if (!file) {
+        imgPrev.style.display = 'none';
+        vidPrev.style.display = 'none';
+        mediaBase64 = null;
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        mediaBase64 = e.target.result;
+        if (file.type.startsWith('image/')) {
+          imgPrev.src = mediaBase64;
+          imgPrev.style.display = 'block';
+          vidPrev.style.display = 'none';
+        } else if (file.type.startsWith('video/')) {
+          vidPrev.src = mediaBase64;
+          vidPrev.style.display = 'block';
+          imgPrev.style.display = 'none';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updatePreview() {
+      const ch = document.getElementById('channel-select').value;
+      const txt = document.getElementById('post-text').value;
+      document.getElementById('preview-platform').innerText = ch;
+      document.getElementById('preview-content').innerText = txt || "Anteprima testo...";
+    }
+
+    // Generatori AI Mockup
+    function generateAiText() {
+      const topic = document.getElementById('post-topic').value || "un argomento speciale";
+      document.getElementById('post-text').value = `✨ Incredibili novità in arrivo! Oggi parliamo di ${topic}. Scoprilo subito al link in bio! 🚀 #PlannerPro #Novità`;
+      updatePreview();
+    }
+
+    function generateAiNewsletter() {
+      const subj = document.getElementById('nl-subject').value || "Novità del Mese";
+      document.getElementById('nl-body').value = `Ciao!\n\nEccoci con i nuovi aggiornamenti dedicati a: ${subj}.\n\nAbbiamo preparato tanti contenuti esclusivi e risorse pratiche per te.\n\nUn caro saluto,\nIl Team`;
+    }
+
+    // Programmazione Post Social
+    function schedulePost() {
+      const channel = document.getElementById('channel-select').value;
+      const date = document.getElementById('post-date').value;
+      const topic = document.getElementById('post-topic').value;
+      const text = document.getElementById('post-text').value;
+      const link = document.getElementById('post-link').value;
+
+      if (!date || !text) {
+        alert('Inserisci almeno la data e il testo del post.');
+        return;
+      }
+
+      state.posts.push({
+        id: Date.now(),
+        channel, date, topic, text, link,
+        media: mediaBase64,
+        published: false
+      });
+
+      localStorage.setItem('planner_posts', JSON.stringify(state.posts));
+      alert('Post programmato con successo!');
+      
+      // Resetta campi
+      document.getElementById('post-topic').value = '';
+      document.getElementById('post-text').value = '';
+      document.getElementById('post-link').value = '';
+      document.getElementById('post-file').value = '';
+      document.getElementById('img-preview').style.display = 'none';
+      document.getElementById('video-preview').style.display = 'none';
+      mediaBase64 = null;
+
+      renderAll();
+    }
+
+    function togglePublishPost(id) {
+      const p = state.posts.find(x => x.id === id);
+      if (p) {
+        p.published = !p.published;
+        localStorage.setItem('planner_posts', JSON.stringify(state.posts));
+        renderAll();
+      }
+    }
+
+    function deletePost(id) {
+      state.posts = state.posts.filter(x => x.id !== id);
+      localStorage.setItem('planner_posts', JSON.stringify(state.posts));
+      renderAll();
+    }
+
+    // Programmazione Newsletter
+    function scheduleNewsletter() {
+      const subject = document.getElementById('nl-subject').value;
+      const body = document.getElementById('nl-body').value;
+      const date = document.getElementById('nl-date').value;
+
+      if (!subject || !body || !date) {
+        alert('Compila tutti i campi della newsletter.');
+        return;
+      }
+
+      state.newsletters.push({ id: Date.now(), subject, body, date });
+      localStorage.setItem('planner_newsletters', JSON.stringify(state.newsletters));
+      alert('Newsletter salvata!');
+
+      document.getElementById('nl-subject').value = '';
+      document.getElementById('nl-body').value = '';
+      document.getElementById('nl-date').value = '';
+
+      renderAll();
+    }
+
+    function deleteNewsletter(id) {
+      state.newsletters = state.newsletters.filter(x => x.id !== id);
+      localStorage.setItem('planner_newsletters', JSON.stringify(state.newsletters));
+      renderAll();
+    }
+
+    // Gestione Libri
+    function toggleBookSaleFields() {
+      const val = document.getElementById('bk-sale-type').value;
+      document.getElementById('bk-person-fields').style.display = (val === 'Persona') ? 'block' : 'none';
+    }
+
+    function addBookBuyRecord() {
+      const title = document.getElementById('bk-title').value;
+      const date = document.getElementById('bk-buy-date').value;
+      const qty = parseInt(document.getElementById('bk-buy-qty').value) || 0;
+      const price = parseFloat(document.getElementById('bk-buy-price').value) || 0;
+
+      if (!title || !date || qty <= 0) {
+        alert('Inserisci titolo, data e quantità valida.');
+        return;
+      }
+
+      state.books.push({
+        id: Date.now(),
+        type: 'Acquisto',
+        title, date, qty, price,
+        totalCost: qty * price
+      });
+
+      localStorage.setItem('planner_books', JSON.stringify(state.books));
+      alert('Acquisto libro registrato!');
+
+      document.getElementById('bk-title').value = '';
+      document.getElementById('bk-buy-date').value = '';
+      document.getElementById('bk-buy-qty').value = '1';
+      document.getElementById('bk-buy-price').value = '';
+
+      renderAll();
+    }
+
+    function addBookSaleRecord() {
+      const title = document.getElementById('bk-custom-title').value;
+      const channel = document.getElementById('bk-sale-type').value;
+
+      if (!title) {
+        alert('Inserisci il titolo del libro.');
+        return;
+      }
+
+      let record = { id: Date.now(), type: 'Vendita', channel, title };
+
+      if (channel === 'Persona') {
+        record.date = document.getElementById('bk-sale-date').value;
+        record.client = document.getElementById('bk-client-name').value;
+        record.qty = parseInt(document.getElementById('bk-sale-qty').value) || 0;
+        record.price = parseFloat(document.getElementById('bk-sale-price').value) || 0;
+        record.totalIncome = record.qty * record.price;
+      } else {
+        record.date = new Date().toISOString().split('T')[0];
+        record.client = 'Amazon Customer';
+        record.qty = 1;
+        record.price = 0;
+        record.totalIncome = 0;
+      }
+
+      state.books.push(record);
+      localStorage.setItem('planner_books', JSON.stringify(state.books));
+      alert('Vendita registrata!');
+
+      document.getElementById('bk-custom-title').value = '';
+      document.getElementById('bk-client-name').value = '';
+      document.getElementById('bk-sale-price').value = '';
+
+      renderAll();
+    }
+
+    function deleteBook(id) {
+      state.books = state.books.filter(x => x.id !== id);
+      localStorage.setItem('planner_books', JSON.stringify(state.books));
+      renderAll();
+    }
+
+    // Gestione Magazzino & Finanze
+    function addFinancialRecord() {
+      const type = document.getElementById('fin-type').value;
+      const desc = document.getElementById('fin-desc').value;
+      const amount = parseFloat(document.getElementById('fin-amount').value) || 0;
+      const date = document.getElementById('fin-date').value;
+
+      if (!desc || !amount || !date) {
+        alert('Compila descrizione, importo e data.');
+        return;
+      }
+
+      state.finance.push({ id: Date.now(), type, desc, amount, date });
+      localStorage.setItem('planner_finance', JSON.stringify(state.finance));
+      alert('Movimento finanziario salvato!');
+
+      document.getElementById('fin-desc').value = '';
+      document.getElementById('fin-amount').value = '';
+      document.getElementById('fin-date').value = '';
+
+      renderAll();
+    }
+
+    function addStockRecord() {
+      const item = document.getElementById('stk-item').value;
+      const qty = parseInt(document.getElementById('stk-qty').value) || 0;
+      const val = parseFloat(document.getElementById('stk-val').value) || 0;
+
+      if (!item || qty <= 0) {
+        alert('Inserisci il nome dell\'articolo e una quantità valida.');
+        return;
+      }
+
+      state.stock.push({ id: Date.now(), item, qty, val });
+      localStorage.setItem('planner_stock', JSON.stringify(state.stock));
+      alert('Articolo aggiunto a magazzino!');
+
+      document.getElementById('stk-item').value = '';
+      document.getElementById('stk-qty').value = '';
+      document.getElementById('stk-val').value = '';
+
+      renderAll();
+    }
+
+    function deleteFinance(id) {
+      state.finance = state.finance.filter(x => x.id !== id);
+      localStorage.setItem('planner_finance', JSON.stringify(state.finance));
+      renderAll();
+    }
+
+    function deleteStock(id) {
+      state.stock = state.stock.filter(x => x.id !== id);
+      localStorage.setItem('planner_stock', JSON.stringify(state.stock));
+      renderAll();
+    }
+
+    // Rendering Globale
+    function renderAll() {
+      // 1. Dashboard & Statistiche
+      document.getElementById('count-scheduled').innerText = state.posts.length;
+      document.getElementById('count-newsletters').innerText = state.newsletters.length;
+      document.getElementById('count-books-total').innerText = state.books.length;
+
+      let inc = state.finance.filter(f => f.type === 'Entrata').reduce((a, b) => a + b.amount, 0);
+      let exp = state.finance.filter(f => f.type === 'Uscita').reduce((a, b) => a + b.amount, 0);
+      
+      // Aggiungi incassi libri
+      state.books.forEach(b => {
+        if (b.type === 'Vendita' && b.totalIncome) inc += b.totalIncome;
+        if (b.type === 'Acquisto' && b.totalCost) exp += b.totalCost;
+      });
+
+      const netProfit = inc - exp;
+      const netProfitEl = document.getElementById('count-profit-net');
+      netProfitEl.innerText = `€${netProfit.toFixed(2)}`;
+      netProfitEl.style.color = netProfit >= 0 ? '#10b981' : '#ef4444';
+
+      document.getElementById('stat-posts').innerText = state.posts.length;
+      document.getElementById('stat-emails').innerText = state.newsletters.length;
+      document.getElementById('stat-income').innerText = `€${inc.toFixed(2)}`;
+      document.getElementById('stat-expenses').innerText = `€${exp.toFixed(2)}`;
+
+      // 2. Tabella Agenda Social
+      const calBody = document.getElementById('calendar-table-body');
+      calBody.innerHTML = '';
+      if (state.posts.length === 0) {
+        calBody.innerHTML = `<tr><td colspan="7" style="color:#888;">Nessun post programmato.</td></tr>`;
+      } else {
+        state.posts.forEach(p => {
+          let iconClass = 'instagram';
+          if (p.channel === 'Facebook') iconClass = 'facebook';
+          if (p.channel === 'LinkedIn') iconClass = 'linkedin';
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>
+              <input type="checkbox" class="cal-checkbox" ${p.published ? 'checked' : ''} onchange="togglePublishPost(${p.id})">
+            </td>
+            <td>
+              <span class="cal-social-icon ${iconClass}">${p.channel.substring(0, 2).toUpperCase()}</span>
+            </td>
+            <td>
+              <strong>${p.date.replace('T', ' ')}</strong>
+              <span class="date-badge">${p.published ? 'Pubblicato' : 'In Coda'}</span>
+            </td>
+            <td><strong>${p.topic || '-'}</strong></td>
+            <td style="max-width:250px; text-align:left;">${p.text}</td>
+            <td>
+              ${p.link ? `<a href="${p.link}" target="_blank">Apri Link</a>` : '-'}
+              ${p.media ? `<br><small style="color:#0d9488;">[Media Allegato]</small>` : ''}
+            </td>
+            <td>
+              <button class="btn-delete-item" onclick="deletePost(${p.id})">Elimina</button>
+            </td>
+          `;
+          calBody.appendChild(tr);
+        });
+      }
+
+      // 3. Newsletter List
+      const nlContainer = document.getElementById('newsletter-container-list');
+      nlContainer.innerHTML = '';
+      if (state.newsletters.length === 0) {
+        nlContainer.innerHTML = '<p style="font-size:13px; color:#888;">Nessuna newsletter in programma.</p>';
+      } else {
+        state.newsletters.forEach(n => {
+          const div = document.createElement('div');
+          div.className = 'post-card-item newsletter-item';
+          div.innerHTML = `
+            <div class="post-card-info">
+              <span class="post-card-badge badge-nl">NEWSLETTER</span> - <strong>${n.date.replace('T', ' ')}</strong>
+              <div style="font-weight:bold; margin-top:5px; font-size:14px;">${n.subject}</div>
+              <div class="nl-body-preview">${n.body}</div>
+            </div>
+            <button class="btn-delete-item" onclick="deleteNewsletter(${n.id})">Elimina</button>
+          `;
+          nlContainer.appendChild(div);
+        });
+      }
+
+      // 4. Books List
+      const bkContainer = document.getElementById('books-container-list');
+      bkContainer.innerHTML = '';
+      if (state.books.length === 0) {
+        bkContainer.innerHTML = '<p style="font-size:13px; color:#888;">Nessun registro libri presente.</p>';
+      } else {
+        state.books.forEach(b => {
+          const div = document.createElement('div');
+          div.className = 'post-card-item book-item';
+          let details = '';
+          if (b.type === 'Acquisto') {
+            details = `Acquistate: ${b.qty} copie @ €${b.price.toFixed(2)} | Totale Costo: €${b.totalCost.toFixed(2)}`;
+          } else {
+            details = `Canale: ${b.channel} | Cliente: ${b.client || '-'} | Qtà: ${b.qty} | Incasso: €${(b.totalIncome || 0).toFixed(2)}`;
+          }
+
+          div.innerHTML = `
+            <div class="post-card-info">
+              <span class="post-card-badge badge-book">${b.type.toUpperCase()}</span> - <strong>${b.date}</strong>
+              <div style="font-weight:bold; margin-top:3px; font-size:14px;">${b.title}</div>
+              <div style="color:#555; margin-top:3px;">${details}</div>
+            </div>
+            <button class="btn-delete-item" onclick="deleteBook(${b.id})">Elimina</button>
+          `;
+          bkContainer.appendChild(div);
+        });
+      }
+
+      // 5. Finance & Stock List
+      const fsContainer = document.getElementById('finance-stock-container-list');
+      fsContainer.innerHTML = '';
+      
+      state.finance.forEach(f => {
+        const div = document.createElement('div');
+        div.className = `post-card-item ${f.type === 'Entrata' ? 'income-item' : 'expense-item'}`;
+        div.innerHTML = `
+          <div class="post-card-info">
+            <span class="post-card-badge ${f.type === 'Entrata' ? 'badge-inc' : 'badge-exp'}">${f.type.toUpperCase()}</span> - <strong>${f.date}</strong>
+            <div style="font-weight:bold; margin-top:3px; font-size:14px;">${f.desc}</div>
+            <div style="color:#555;">Importo: €${f.amount.toFixed(2)}</div>
+          </div>
+          <button class="btn-delete-item" onclick="deleteFinance(${f.id})">Elimina</button>
+        `;
+        fsContainer.appendChild(div);
+      });
+
+      state.stock.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'post-card-item stock-item';
+        div.innerHTML = `
+          <div class="post-card-info">
+            <span class="post-card-badge badge-stock">MAGAZZINO</span>
+            <div style="font-weight:bold; margin-top:3px; font-size:14px;">${s.item}</div>
+            <div style="color:#555;">Quantità: ${s.qty} | Valore Unitario: €${s.val.toFixed(2)}</div>
+          </div>
+          <button class="btn-delete-item" onclick="deleteStock(${s.id})">Elimina</button>
+        `;
+        fsContainer.appendChild(div);
+      });
+
+      if (state.finance.length === 0 && state.stock.length === 0) {
+        fsContainer.innerHTML = '<p style="font-size:13px; color:#888;">Nessun movimento finanziario o articolo di magazzino registrato.</p>';
+      }
+    }
+
+    // Esportazione Excel Nativi (.xlsx) tramite SheetJS
+    function exportToExcel() {
+      if (typeof XLSX === 'undefined') {
+        alert('Libreria SheetJS non caricata correttamente.');
+        return;
+      }
+
+      const wb = XLSX.utils.book_new();
+
+      // Foglio Post
+      const postsData = state.posts.map(p => ({
+        Canale: p.channel,
+        DataOra: p.date,
+        Topic: p.topic,
+        Testo: p.text,
+        Link: p.link,
+        Pubblicato: p.published ? 'SI' : 'NO'
+      }));
+      const wsPosts = XLSX.utils.json_to_sheet(postsData);
+      XLSX.utils.book_append_sheet(wb, wsPosts, "Post Social");
+
+      // Foglio Newsletter
+      const nlData = state.newsletters.map(n => ({
+        Oggetto: n.subject,
+        DataOra: n.date,
+        Contenuto: n.body
+      }));
+      const wsNl = XLSX.utils.json_to_sheet(nlData);
+      XLSX.utils.book_append_sheet(wb, wsNl, "Newsletter");
+
+      // Foglio Libri
+      const bkData = state.books.map(b => ({
+        Tipo: b.type,
+        Titolo: b.title,
+        Data: b.date,
+        Canale: b.channel || '-',
+        Cliente: b.client || '-',
+        Quantita: b.qty,
+        PrezzoUnitario: b.price,
+        Totale: b.totalCost || b.totalIncome || 0
+      }));
+      const wsBk = XLSX.utils.json_to_sheet(bkData);
+      XLSX.utils.book_append_sheet(wb, wsBk, "Libri & Vendite");
+
+      // Foglio Finanze & Magazzino
+      const finData = state.finance.map(f => ({
+        Tipo: f.type,
+        Descrizione: f.desc,
+        Importo: f.amount,
+        Data: f.date
+      }));
+      const wsFin = XLSX.utils.json_to_sheet(finData);
+      XLSX.utils.book_append_sheet(wb, wsFin, "Finanze");
+
+      const stockData = state.stock.map(s => ({
+        Articolo: s.item,
+        Quantita: s.qty,
+        ValoreUnitario: s.val,
+        ValoreTotale: s.qty * s.val
+      }));
+      const wsStock = XLSX.utils.json_to_sheet(stockData);
+      XLSX.utils.book_append_sheet(wb, wsStock, "Magazzino");
+
+      XLSX.writeFile(wb, `Planner_Pro_Report_${state.user.name || 'Export'}.xlsx`);
+    }
+
+    // Invio Dati via EmailJS
+    function sendDataToEmail() {
+      if (!state.user.email) {
+        alert('Nessun indirizzo email specificato.');
+        return;
+      }
+
+      const summary = `
+Report Planner Pro per: ${state.user.name} (${state.user.email})
+
+- Post Programmati: ${state.posts.length}
+- Newsletter Pianificate: ${state.newsletters.length}
+- Registri Libri: ${state.books.length}
+- Movimenti Finanziari: ${state.finance.length}
+- Articoli Magazzino: ${state.stock.length}
+      `;
+
+      if (window.emailjs && emailjs.send) {
+        emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+          to_email: state.user.email,
+          user_name: state.user.name,
+          message: summary
+        }).then(
+          function() { alert("Report inviato con successo alla tua email!"); },
+          function(error) { alert("Invio tramite EmailJS fallito. Verifica la configurazione della libreria."); console.error(error); }
+        );
+      } else {
+        alert("Simulazione Invio Email:\n" + summary);
+      }
+    }
+  </script>
 </body>
 </html>
